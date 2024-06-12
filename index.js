@@ -3,6 +3,10 @@ const r = require('raylib')
 // math consts
 
 const RAD2DEG = 180 / Math.PI;
+const DEG2RAD = Math.PI / 180;
+function calculateDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
 
 // constants
 
@@ -29,9 +33,10 @@ const WAYPOINTS = [
 // variables
 
 let debug = false
-let tower;
+let tower
 let enemyEmitter
-let shooters
+let shooters = []
+let projectiles = []
 
 // game
 
@@ -72,7 +77,7 @@ class Enemy extends GameObject {
     constructor(position, width, height, color) {
         super(position, width, height, color)
         this.waypointIndex = 0;
-        this.health = 20;
+        this.health = 4;
         this.maxHealth = this.health;
     }
 
@@ -103,8 +108,8 @@ class Enemy extends GameObject {
     
         // Update waypoint when reach it (consider the threshold)
         if (distanceToWaypoint < threshold && this.waypointIndex < WAYPOINTS.length - 1) {
-            // this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
-            this.waypointIndex++;
+            this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
+            // this.waypointIndex++;
         }
     }
 
@@ -140,14 +145,15 @@ class EnemyEmitter {
         this.position = position;
         this.capacity = capacity; // total enemies that this emitter can emit
         this.maxAlive = maxAlive; // total enemie that are allowed to be alive
-        this.enemies = [];
-        this.spawnTimer = 0;
+        this.enemies = []
+        this.spawnTimer = 0
+        this.spawnRate = 0.5
     }
 
     update(dt) {
         this.spawnTimer += dt;
 
-        if (this.spawnTimer >= 1) {
+        if (this.spawnTimer >= this.spawnRate) {
             this.spawnTimer = 0;
             if (this.enemies.length < this.maxAlive && this.capacity > 0) {
                 this.capacity--;
@@ -171,33 +177,83 @@ class EnemyEmitter {
     }
 }
 
-class Shooter extends GameObject {
+class Projectile extends GameObject {
 
-    constructor(position) {
+    constructor(position, angle) {
         super(position)
-        this.angle = 0
+        this.damage = 2
+        this.width = 2
+
+        const radians = angle * DEG2RAD;
+        this.velocity = {
+            x: Math.cos(radians) * 5,
+            y: Math.sin(radians) * 5,
+        }
     }
 
     update(dt) {
-        if(r.IsKeyDown(r.KEY_LEFT)) {
-            this.angle -= 1
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+    }
+
+    render() {
+        r.DrawCircle(this.position.x, this.position.y, this.width, r.WHITE)
+    }
+
+    rect() {
+        return {
+            x: this.position.x, 
+            y: this.position.y,
+            width: this.width,
+            height: this.width,
         }
-        if (r.IsKeyDown(r.KEY_RIGHT)) {
-            this.angle += 1
-        }
+    }
+}
+
+class Shooter extends GameObject {
+    constructor(position) {
+        super(position)
+        this.angle = 0
+        this.shootTimer = 0
+        this.shootRate = 1
+        this.reach = 50
+    }
+
+    update(dt) {
+        this.shootTimer += dt;
 
         // TODO: smarter logic to detect target
-        let target
-        if (enemyEmitter.enemies.length > 0) {
-            target = {}
-            target.x = enemyEmitter.enemies[0].position.x
-            target.y = enemyEmitter.enemies[0].position.y
+        // let target
+        // if (enemyEmitter.enemies.length > 0) {
+        //     target = {}
+        //     target.x = enemyEmitter.enemies[0].position.x
+        //     target.y = enemyEmitter.enemies[0].position.y
+        // }
+
+        // Check for enemies within the tower's radius
+        let target = null;
+        for (let i = 0; i < enemyEmitter.enemies.length; i++) {
+            let distance = calculateDistance(this.position.x, this.position.y, enemyEmitter.enemies[i].position.x, enemyEmitter.enemies[i].position.y);
+            if (distance <= this.reach) {
+                target = enemyEmitter.enemies[i];
+                break;
+            }
         }
 
         if (target) {
-            let dx = target.x - this.position.x;
-            let dy = target.y - this.position.y;
+            let dx = target.position.x - this.position.x;
+            let dy = target.position.y - this.position.y;
             this.angle = Math.atan2(dy, dx) * RAD2DEG;
+
+            if (this.shootTimer >= this.shootRate) {
+                this.shootTimer = 0;
+                projectiles.push(
+                    new Projectile({
+                        x: this.position.x,
+                        y: this.position.y,
+                    }, this.angle)
+                )
+            }
         }
     }
 
@@ -215,6 +271,7 @@ class Shooter extends GameObject {
             r.BROWN
         )
         r.DrawCircle(this.position.x, this.position.y, 5, r.BROWN)
+        r.DrawCircleLines(this.position.x, this.position.y, this.reach, {...r.WHITE, a: 100})
     }
 }
 
@@ -245,8 +302,7 @@ class Tower extends GameObject {
 }
 
 tower = new Tower({ x: 262, y: 35 }, 25, 25, r.GRAY)
-enemyEmitter = new EnemyEmitter(r.Vector2(0, 42), 10, 3)
-shooters = []
+enemyEmitter = new EnemyEmitter(r.Vector2(0, 42), 100, 10)
 
 while (!r.WindowShouldClose()) {
     const dt = r.GetFrameTime()
@@ -263,15 +319,22 @@ while (!r.WindowShouldClose()) {
     }
 
     // Update
-    tower.update(dt);
-    enemyEmitter.update(dt);
+    tower.update(dt)
+    enemyEmitter.update(dt)
     shooters.forEach(shooter => shooter.update(dt))
+    projectiles.forEach(p => p.update(dt))
 
     // Collision checks
     enemyEmitter.enemies.forEach(enemy => {
         if (r.CheckCollisionRecs(tower.rect(), enemy.rect())) {
             tower.health = tower.health - 1;
         }
+
+        projectiles.forEach(p => {
+            if (r.CheckCollisionRecs(p.rect(), enemy.rect())) {
+                enemy.health = enemy.health - p.damage;
+            }
+        })
     })
 
     // Render game objects to texture at internal resolution
@@ -283,6 +346,7 @@ while (!r.WindowShouldClose()) {
         tower.render()
         enemyEmitter.render()
         shooters.forEach(shooter => shooter.render())
+        projectiles.forEach(p => p.render())
     r.EndTextureMode()
 
     // Render the texture and scale it
