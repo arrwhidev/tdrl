@@ -1,4 +1,5 @@
 const r = require('raylib')
+const fs = require('fs')
 
 // math consts
 
@@ -13,6 +14,9 @@ function calculateDistance(x1, y1, x2, y2) {
 const WIDTH          = 320
 const HEIGHT         = 240
 const SCALING_FACTOR = 3
+const TILE_SIZE      = 20
+const NUM_ROWS       = HEIGHT / TILE_SIZE;
+const NUM_COLS       = WIDTH / TILE_SIZE;
 const WAYPOINTS = [
     { x: 30, y: 43 },
     { x: 44, y: 191 },
@@ -37,35 +41,34 @@ let tower
 let enemyEmitter
 let shooters = []
 let projectiles = []
+let grid;
+const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 
 // game
 
 r.InitWindow(WIDTH * SCALING_FACTOR, HEIGHT * SCALING_FACTOR, "tdrl")
-r.SetTargetFPS(60)
+r.SetTargetFPS(0) // uncapped
 
-const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
+// load files
+
 const tex = r.LoadRenderTexture(WIDTH, HEIGHT)
 const bg = r.LoadTexture('./bg.png')
 
 class GameObject {
-    constructor(position, width, height, color) {
+    constructor(position, velocity, width, height, color) {
         this.position = position || r.Vector2(0, 0);
+        this.velocity = velocity || null;
         this.width = width || 0;
         this.height = height || 0;
         this.color = color || r.BLACK;
     }
 
-    update(dt) {
-
-    }
-
-    render() {
-
-    }
+    update(dt) {}
+    render() {}
 
     rect() {
         return {
-            x: this.position.x, 
+            x: this.position.x,
             y: this.position.y,
             width: this.width,
             height: this.height,
@@ -73,41 +76,114 @@ class GameObject {
     }
 }
 
+class Grid {
+    constructor() {
+        this.cursor = r.Vector2(0, 0);
+        this.cursorGrid = r.Vector2(0, 0);
+
+        // init grid with empty arrays
+        this.grid = new Array(NUM_ROWS)
+        this.grid.forEach(row => {
+            row = new Array(NUM_COLS)
+        })
+        
+    }
+
+    update(dt) {
+        const mouseX = r.GetMouseX() / SCALING_FACTOR;
+        const mouseY = r.GetMouseY() / SCALING_FACTOR;
+
+        this.cursorGrid.x = Math.floor(mouseX / TILE_SIZE);
+        this.cursorGrid.y = Math.floor(mouseY / TILE_SIZE);
+
+        this.cursor.x = this.cursorGrid.x * TILE_SIZE;
+        this.cursor.y = this.cursorGrid.y * TILE_SIZE;
+
+        if (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)) {
+            const { x, y } = this.cursor;
+            const shooter = new Shooter({
+                x: x + TILE_SIZE / 2,
+                y: y + TILE_SIZE / 2
+            })
+            shooters.push(shooter)
+        }
+    }
+    
+
+    render() {
+        for (let rowIndex = 0; rowIndex < NUM_ROWS; rowIndex++) {
+            for (let colIndex = 0; colIndex < NUM_COLS; colIndex++) {
+                const y = rowIndex * TILE_SIZE;
+                const x = colIndex * TILE_SIZE;
+
+                r.DrawRectangleLines(x, y, TILE_SIZE, TILE_SIZE, {...r.BLACK, a:100});
+            }
+        }
+
+        const color = allowed ? {...r.GREEN, a: 100} : {...r.RED, a: 200}
+        r.DrawRectangleLines(this.cursor.x, this.cursor.y, TILE_SIZE, TILE_SIZE, color);
+    }
+}
+
 class Enemy extends GameObject {
     constructor(position, width, height, color) {
-        super(position, width, height, color)
+        super(position, r.Vector2(0,0), width, height, color);
         this.waypointIndex = 0;
         this.health = 4;
+        this.damage = 2;
+        this.speed = 30;
         this.maxHealth = this.health;
     }
 
     update(dt) {
-        const wpx = WAYPOINTS[this.waypointIndex].x;
-        const wpy = WAYPOINTS[this.waypointIndex].y;
-    
+        // Get current way point
+        const waypoint = WAYPOINTS[this.waypointIndex]
+        const threshold = 1;
+        
+        /*
         // Calculate the distance to the current waypoint
-        const distanceToWaypoint = Math.sqrt(
-            Math.pow((wpx - this.position.x), 2) + 
-            Math.pow((wpy - this.position.y), 2));
+        const distanceToWaypoint = calculateDistance(waypoint.x, waypoint.y, this.position.x, this.position.y)
     
         // Define a small threshold to consider the element has reached the waypoint
         const threshold = 1;
-    
+         
+
         // move towards waypoint
-        if (this.position.x < wpx) {
+        if (this.position.x < waypoint.x) {
             this.position.x++;
-        } else if (this.position.x > wpx) {
+        } else if (this.position.x > waypoint.x) {
             this.position.x--;
         }
     
-        if (this.position.y < wpy) {
+        if (this.position.y < waypoint.y) {
             this.position.y++;
-        } else if (this.position.y > wpy) {
+        } else if (this.position.y > waypoint.y) {
             this.position.y--;
         }
+        */
+
+        // Calculate the direction vector
+        let directionX = waypoint.x - this.position.x;
+        let directionY = waypoint.y - this.position.y;
+
+        // Calculate the distance to the waypoint
+        let distance = Math.sqrt(directionX ** 2 + directionY ** 2);
+      
+
+        // Calculate the angle to the waypoint
+        let angle = Math.atan2(directionY, directionX); // Angle in radians
+
+        // Set velocity based on the angle and speed
+        this.velocity.x = Math.cos(angle) * this.speed;
+        this.velocity.y = Math.sin(angle) * this.speed;
+
+        // Update position based on velocity and deltaTime
+        this.position.x += this.velocity.x * dt;
+        this.position.y += this.velocity.y * dt;
+
     
         // Update waypoint when reach it (consider the threshold)
-        if (distanceToWaypoint < threshold && this.waypointIndex < WAYPOINTS.length - 1) {
+        if (distance < threshold && this.waypointIndex < WAYPOINTS.length - 1) {
             this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
             // this.waypointIndex++;
         }
@@ -183,21 +259,27 @@ class Projectile extends GameObject {
         super(position)
         this.damage = 2
         this.width = 2
+        this.speed = 200
 
         const radians = angle * DEG2RAD;
         this.velocity = {
-            x: Math.cos(radians) * 5,
-            y: Math.sin(radians) * 5,
+            x: Math.cos(radians) * this.speed,
+            y: Math.sin(radians) * this.speed,
         }
+        this.alive = true
     }
 
     update(dt) {
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
+        this.position.x += this.velocity.x * dt
+        this.position.y += this.velocity.y * dt
     }
 
     render() {
         r.DrawCircle(this.position.x, this.position.y, this.width, r.WHITE)
+    }
+
+    kill() {
+        this.alive = false
     }
 
     rect() {
@@ -277,7 +359,7 @@ class Shooter extends GameObject {
 
 class Tower extends GameObject {
     constructor(position, width, height, color) {
-        super(position, width, height, color)
+        super(position, null, width, height, color)
         this.health = 100
         this.maxHealth = 100
     }
@@ -301,8 +383,9 @@ class Tower extends GameObject {
     }
 }
 
+grid = new Grid();
 tower = new Tower({ x: 262, y: 35 }, 25, 25, r.GRAY)
-enemyEmitter = new EnemyEmitter(r.Vector2(0, 42), 100, 10)
+enemyEmitter = new EnemyEmitter(r.Vector2(0, 42), 1000, 200)
 
 while (!r.WindowShouldClose()) {
     const dt = r.GetFrameTime()
@@ -312,30 +395,28 @@ while (!r.WindowShouldClose()) {
         debug = !debug;
     }
 
-    if (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)) {
-        const mouse = r.GetMousePosition()
-        const shooter = new Shooter({x: mouse.x / SCALING_FACTOR, y: mouse.y / SCALING_FACTOR })
-        shooters.push(shooter)
-    }
-
     // Update
+    grid.update(dt)
     tower.update(dt)
     enemyEmitter.update(dt)
     shooters.forEach(shooter => shooter.update(dt))
     projectiles.forEach(p => p.update(dt))
+    
 
     // Collision checks
     enemyEmitter.enemies.forEach(enemy => {
         if (r.CheckCollisionRecs(tower.rect(), enemy.rect())) {
-            tower.health = tower.health - 1;
+            tower.health = tower.health - enemy.damage;
         }
 
         projectiles.forEach(p => {
             if (r.CheckCollisionRecs(p.rect(), enemy.rect())) {
                 enemy.health = enemy.health - p.damage;
+                p.kill()
             }
         })
     })
+    projectiles = projectiles.filter(p => p.alive);
 
     // Render game objects to texture at internal resolution
     r.BeginTextureMode(tex)
@@ -347,6 +428,8 @@ while (!r.WindowShouldClose()) {
         enemyEmitter.render()
         shooters.forEach(shooter => shooter.render())
         projectiles.forEach(p => p.render())
+        grid.render();
+        r.DrawText(r.GetFPS()+"fps", 3, 3, 5, r.RAYWHITE)
     r.EndTextureMode()
 
     // Render the texture and scale it
