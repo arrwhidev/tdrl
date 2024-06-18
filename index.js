@@ -41,18 +41,117 @@ let tower
 let enemyEmitter
 let shooters = []
 let projectiles = []
-let grid;
-const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
+let grid
 
-// game
+// init
 
 r.InitWindow(WIDTH * SCALING_FACTOR, HEIGHT * SCALING_FACTOR, "tdrl")
 r.SetTargetFPS(0) // uncapped
 
-// load files
+// game
 
+const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 const tex = r.LoadRenderTexture(WIDTH, HEIGHT)
-const bg = r.LoadTexture('./bg.png')
+
+// load
+
+const mapjson = JSON.parse(fs.readFileSync('map.json'));
+const spritesheet = r.LoadTexture(mapjson.sprite_sheet);
+
+// classes
+
+class Grid {
+    constructor() {
+        this.cursor = r.Vector2(0, 0);
+        
+        // init grid
+        // access via this.grid[row][col]
+        this.grid = new Array(NUM_ROWS);
+        for (let row = 0; row < NUM_ROWS; row++) {
+            if (!this.grid[row]) {
+                this.grid[row] = new Array(NUM_COLS);
+            }
+            for (let col = 0; col < NUM_COLS; col++) {
+                const flatIndex = row * NUM_COLS + col;
+                const spriteId = mapjson.map[flatIndex];
+                const spriteRow = Math.floor(spriteId / mapjson.sprite_sheet_cols);
+                const spriteCol = spriteId % mapjson.sprite_sheet_cols;
+                this.grid[row][col] = {
+                    flatIndex,
+                    isFree: spriteId === 81,
+                    sprite: {
+                        id: spriteId,
+                        rect: {
+                            x: spriteCol * 16,
+                            y: spriteRow * 16, 
+                            width: 16,
+                            height: 16,
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    update(dt) {
+        // cursor grid position
+        const mouseX = r.GetMouseX() / SCALING_FACTOR;
+        const mouseY = r.GetMouseY() / SCALING_FACTOR;
+        this.cursor.x = Math.floor(mouseX / TILE_SIZE);
+        this.cursor.y = Math.floor(mouseY / TILE_SIZE);
+    }
+
+    render() {
+        // grid sprites
+        for (let row = 0; row < NUM_ROWS; row++) {
+            for (let col = 0; col < NUM_COLS; col++) {
+                const g = this.grid[row][col];
+                r.DrawTexturePro(
+                    spritesheet, 
+                    g.sprite.rect,
+                    { 
+                        x: col * TILE_SIZE,
+                        y: row * TILE_SIZE,
+                        width: TILE_SIZE,
+                        height: TILE_SIZE,
+                    },
+                    { x: 0, y: 0 },
+                    0,
+                    r.WHITE)
+            }
+        }
+
+        // grid lines
+        for (let row = 0; row < NUM_ROWS; row++) {
+            for (let col = 0; col < NUM_COLS; col++) {
+                r.DrawRectangleLinesEx({
+                    x: col * TILE_SIZE,
+                    y: row * TILE_SIZE,
+                    width: TILE_SIZE,
+                    height: TILE_SIZE,
+                }, 1, { ...r.BLACK, a: 100 })
+            }
+        }
+
+        // highlight cursor grid element
+        const showCursorSelect = true;
+        if (showCursorSelect) {
+            let g = this.grid[this.cursor.y]
+            if (g) {
+                g = g[this.cursor.x]
+                if (g) {
+                    const color = g.isFree ? {...r.GREEN, a: 200} : {...r.RED, a: 200}
+                    r.DrawRectangleLinesEx({
+                        x: this.cursor.x * TILE_SIZE,
+                        y: this.cursor.y * TILE_SIZE,
+                        width: TILE_SIZE,
+                        height: TILE_SIZE,
+                    }, 1, color)
+                }
+            }
+        }
+    }
+}
 
 class GameObject {
     constructor(position, velocity, width, height, color) {
@@ -73,55 +172,6 @@ class GameObject {
             width: this.width,
             height: this.height,
         }
-    }
-}
-
-class Grid {
-    constructor() {
-        this.cursor = r.Vector2(0, 0);
-        this.cursorGrid = r.Vector2(0, 0);
-
-        // init grid with empty arrays
-        this.grid = new Array(NUM_ROWS)
-        this.grid.forEach(row => {
-            row = new Array(NUM_COLS)
-        })
-        
-    }
-
-    update(dt) {
-        const mouseX = r.GetMouseX() / SCALING_FACTOR;
-        const mouseY = r.GetMouseY() / SCALING_FACTOR;
-
-        this.cursorGrid.x = Math.floor(mouseX / TILE_SIZE);
-        this.cursorGrid.y = Math.floor(mouseY / TILE_SIZE);
-
-        this.cursor.x = this.cursorGrid.x * TILE_SIZE;
-        this.cursor.y = this.cursorGrid.y * TILE_SIZE;
-
-        if (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)) {
-            const { x, y } = this.cursor;
-            const shooter = new Shooter({
-                x: x + TILE_SIZE / 2,
-                y: y + TILE_SIZE / 2
-            })
-            shooters.push(shooter)
-        }
-    }
-    
-
-    render() {
-        for (let rowIndex = 0; rowIndex < NUM_ROWS; rowIndex++) {
-            for (let colIndex = 0; colIndex < NUM_COLS; colIndex++) {
-                const y = rowIndex * TILE_SIZE;
-                const x = colIndex * TILE_SIZE;
-
-                r.DrawRectangleLines(x, y, TILE_SIZE, TILE_SIZE, {...r.BLACK, a:100});
-            }
-        }
-
-        const color = allowed ? {...r.GREEN, a: 100} : {...r.RED, a: 200}
-        r.DrawRectangleLines(this.cursor.x, this.cursor.y, TILE_SIZE, TILE_SIZE, color);
     }
 }
 
@@ -401,7 +451,6 @@ while (!r.WindowShouldClose()) {
     enemyEmitter.update(dt)
     shooters.forEach(shooter => shooter.update(dt))
     projectiles.forEach(p => p.update(dt))
-    
 
     // Collision checks
     enemyEmitter.enemies.forEach(enemy => {
@@ -423,12 +472,11 @@ while (!r.WindowShouldClose()) {
     r.ClearBackground(r.RAYWHITE)
 
     r.BeginMode2D(camera)
-    r.DrawTexture(bg, 0, 0, r.WHITE)
+        grid.render();
         tower.render()
         enemyEmitter.render()
         shooters.forEach(shooter => shooter.render())
         projectiles.forEach(p => p.render())
-        grid.render();
         r.DrawText(r.GetFPS()+"fps", 3, 3, 5, r.RAYWHITE)
     r.EndTextureMode()
 
