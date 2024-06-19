@@ -18,20 +18,15 @@ const TILE_SIZE      = 20
 const NUM_ROWS       = HEIGHT / TILE_SIZE;
 const NUM_COLS       = WIDTH / TILE_SIZE;
 const WAYPOINTS = [
-    { x: 30, y: 43 },
-    { x: 44, y: 191 },
-    { x: 75, y: 207 },
-    { x: 114, y: 187 },
-    { x: 124, y: 127 },
-    { x: 122, y: 66 },
-    { x: 147, y: 40 },
-    { x: 195, y: 48 },
-    { x: 206, y: 103 },
-    { x: 198, y: 182 },
-    { x: 221, y: 210 },
-    { x: 265, y: 200 },
-    { x: 278, y: 130 },
-    { x: 275, y: 43 }
+    { x: 0, y: 30 },
+    { x: 30, y: 30 },
+    { x: 30, y: 210 },
+    { x: 90, y: 210 },
+    { x: 90, y: 30 },
+    { x: 150, y: 30 },
+    { x: 150, y: 210 },
+    { x: 250, y: 210 },
+    { x: 250, y: 70 },
 ]
 
 // variables
@@ -189,28 +184,6 @@ class Enemy extends GameObject {
         // Get current way point
         const waypoint = WAYPOINTS[this.waypointIndex]
         const threshold = 1;
-        
-        /*
-        // Calculate the distance to the current waypoint
-        const distanceToWaypoint = calculateDistance(waypoint.x, waypoint.y, this.position.x, this.position.y)
-    
-        // Define a small threshold to consider the element has reached the waypoint
-        const threshold = 1;
-         
-
-        // move towards waypoint
-        if (this.position.x < waypoint.x) {
-            this.position.x++;
-        } else if (this.position.x > waypoint.x) {
-            this.position.x--;
-        }
-    
-        if (this.position.y < waypoint.y) {
-            this.position.y++;
-        } else if (this.position.y > waypoint.y) {
-            this.position.y--;
-        }
-        */
 
         // Calculate the direction vector
         let directionX = waypoint.x - this.position.x;
@@ -234,8 +207,8 @@ class Enemy extends GameObject {
     
         // Update waypoint when reach it (consider the threshold)
         if (distance < threshold && this.waypointIndex < WAYPOINTS.length - 1) {
-            this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
-            // this.waypointIndex++;
+            // this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
+            this.waypointIndex++;
         }
     }
 
@@ -434,15 +407,34 @@ class Tower extends GameObject {
 }
 
 grid = new Grid();
-tower = new Tower({ x: 262, y: 35 }, 25, 25, r.GRAY)
-enemyEmitter = new EnemyEmitter(r.Vector2(0, 42), 1000, 200)
+tower = new Tower({ x: 240, y: 60 }, 25, 25, r.GRAY)
+enemyEmitter = new EnemyEmitter(WAYPOINTS[0], 1000, 200)
 
 while (!r.WindowShouldClose()) {
     const dt = r.GetFrameTime()
 
+    // process specific input
+
     // Debug
     if (r.IsKeyPressed(r.KEY_D)) {
         debug = !debug;
+    }
+
+    // Shooter create
+    if (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)) {
+        let g = grid.grid[grid.cursor.y]
+        if (g) {
+            g = g[grid.cursor.x]
+            if (g && g.isFree) {
+                shooters.push(
+                    new Shooter({
+                        x: (grid.cursor.x * TILE_SIZE) + (TILE_SIZE / 2),
+                        y: (grid.cursor.y * TILE_SIZE) + (TILE_SIZE / 2),
+                    })
+                )
+                grid.grid[grid.cursor.y][grid.cursor.x].isFree = false;
+            }
+        }
     }
 
     // Update
