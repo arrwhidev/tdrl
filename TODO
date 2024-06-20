@@ -1,4 +1,8 @@
 smoothly rotate shooter between targets
 projectiles often miss enemies
-a* for enemy pathfinding
 enemy health bar should be rendered on top
+hud
+ui
+coins, pricing, purchasing
+a* for enemy pathfinding
+    https://www.redblobgames.com/pathfinding/a-star/introduction.html

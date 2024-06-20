@@ -17,6 +17,7 @@ const SCALING_FACTOR = 3
 const TILE_SIZE      = 20
 const NUM_ROWS       = HEIGHT / TILE_SIZE;
 const NUM_COLS       = WIDTH / TILE_SIZE;
+const FONT_SIZE      = 12.2;
 const WAYPOINTS = [
     { x: 0, y: 30 },
     { x: 30, y: 30 },
@@ -29,6 +30,10 @@ const WAYPOINTS = [
     { x: 250, y: 70 },
 ]
 
+const PLAYER = {
+    coins: 0,
+}
+
 // variables
 
 let debug = false
@@ -37,6 +42,8 @@ let enemyEmitter
 let shooters = []
 let projectiles = []
 let grid
+let hud
+let magicNumber = 0
 
 // init
 
@@ -48,10 +55,12 @@ r.SetTargetFPS(0) // uncapped
 const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 const tex = r.LoadRenderTexture(WIDTH, HEIGHT)
 
-// load
+// load resources
 
-const mapjson = JSON.parse(fs.readFileSync('map.json'));
-const spritesheet = r.LoadTexture(mapjson.sprite_sheet);
+const fontRegular = r.LoadFont("./resources/fonts/MinecraftRegular-Bmg3.otf")
+const fontBold = r.LoadFont("./resources/fonts/MinecraftBold-nMK1.otf")
+const mapjson = JSON.parse(fs.readFileSync('./resources/map.json'))
+const spritesheet = r.LoadTexture(`./resources/spritesheets/${mapjson.sprite_sheet}`)
 
 // classes
 
@@ -170,6 +179,33 @@ class GameObject {
     }
 }
 
+class Hud extends GameObject {
+    constructor() {
+        super({ x: WIDTH / 2, y: 0 }, null, 0, 0, r.WHITE)
+        this.margin = 3;
+    }
+    update() {}
+
+    render() {
+        const renderHud = true;
+        if (renderHud) {
+            // naive width calculation
+            const pixelsPerCharacter = 6;
+            const value = PLAYER.coins + " coins";
+            const width = value.length * pixelsPerCharacter;
+            r.DrawTextPro(fontRegular, PLAYER.coins + " coins", {
+                x: this.position.x - width / 2,
+                y: this.position.y + this.margin
+            }, { x: 0, y: 0}, 0, FONT_SIZE, 1, r.WHITE);
+        }
+
+        if (debug) {
+            r.DrawTextPro(fontRegular, r.GetFPS() + "fps", 
+            { x: 3, y: 3 }, { x: 0, y: 0}, 0, FONT_SIZE, 1, r.WHITE);
+        }
+    }
+}
+
 class Enemy extends GameObject {
     constructor(position, width, height, color) {
         super(position, r.Vector2(0,0), width, height, color);
@@ -204,7 +240,6 @@ class Enemy extends GameObject {
         this.position.x += this.velocity.x * dt;
         this.position.y += this.velocity.y * dt;
 
-    
         // Update waypoint when reach it (consider the threshold)
         if (distance < threshold && this.waypointIndex < WAYPOINTS.length - 1) {
             // this.waypointIndex = (this.waypointIndex + 1) % WAYPOINTS.length;
@@ -265,6 +300,9 @@ class EnemyEmitter {
 
         this.enemies.forEach(enemy => {
             enemy.update(dt);
+            if (enemy.health <= 0) {
+                PLAYER.coins++;
+            }
         });
         this.enemies = this.enemies.filter(enemy => enemy.health > 0);
     }
@@ -406,6 +444,7 @@ class Tower extends GameObject {
     }
 }
 
+hud = new Hud();
 grid = new Grid();
 tower = new Tower({ x: 240, y: 60 }, 25, 25, r.GRAY)
 enemyEmitter = new EnemyEmitter(WAYPOINTS[0], 1000, 200)
@@ -413,7 +452,15 @@ enemyEmitter = new EnemyEmitter(WAYPOINTS[0], 1000, 200)
 while (!r.WindowShouldClose()) {
     const dt = r.GetFrameTime()
 
-    // process specific input
+    // Process specific input
+    if (r.IsKeyPressed(r.KEY_UP)) {
+        magicNumber++
+        console.log('magic number', magicNumber)
+    }
+    if (r.IsKeyPressed(r.KEY_DOWN)) {
+        magicNumber--
+        console.log('magic number', magicNumber)
+    }
 
     // Debug
     if (r.IsKeyPressed(r.KEY_D)) {
@@ -443,6 +490,7 @@ while (!r.WindowShouldClose()) {
     enemyEmitter.update(dt)
     shooters.forEach(shooter => shooter.update(dt))
     projectiles.forEach(p => p.update(dt))
+    hud.update(dt);
 
     // Collision checks
     enemyEmitter.enemies.forEach(enemy => {
@@ -469,7 +517,7 @@ while (!r.WindowShouldClose()) {
         enemyEmitter.render()
         shooters.forEach(shooter => shooter.render())
         projectiles.forEach(p => p.render())
-        r.DrawText(r.GetFPS()+"fps", 3, 3, 5, r.RAYWHITE)
+        hud.render();
     r.EndTextureMode()
 
     // Render the texture and scale it
