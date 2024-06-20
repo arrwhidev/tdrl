@@ -1,3 +1,4 @@
+move more attributes and updates to GameObject
 smoothly rotate shooter between targets
 projectiles often miss enemies
 enemy health bar should be rendered on top
@@ -6,3 +7,6 @@ ui
 coins, pricing, purchasing
 a* for enemy pathfinding
     https://www.redblobgames.com/pathfinding/a-star/introduction.html
+
+move enemies out of emitter?
+move projectiles out of shooter?
