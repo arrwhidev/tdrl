@@ -64,33 +64,33 @@ export default class Grid {
         }
 
         // grid lines
-        for (let row = 0; row < config.NUM_ROWS; row++) {
-            for (let col = 0; col < config.NUM_COLS; col++) {
-                r.DrawRectangleLinesEx({
-                    x: col * config.TILE_SIZE,
-                    y: row * config.TILE_SIZE,
-                    width: config.TILE_SIZE,
-                    height: config.TILE_SIZE,
-                }, 1, { ...r.BLACK, a: 100 })
-            }
-        }
+        // for (let row = 0; row < config.NUM_ROWS; row++) {
+        //     for (let col = 0; col < config.NUM_COLS; col++) {
+        //         r.DrawRectangleLinesEx({
+        //             x: col * config.TILE_SIZE,
+        //             y: row * config.TILE_SIZE,
+        //             width: config.TILE_SIZE,
+        //             height: config.TILE_SIZE,
+        //         }, 1, { ...r.BLACK, a: 100 })
+        //     }
+        // }
 
-        // highlight cursor grid element
-        const showCursorSelect = true;
-        if (showCursorSelect) {
-            let g = this.grid[this.cursor.y]
-            if (g) {
-                g = g[this.cursor.x]
-                if (g) {
-                    const color = g.isFree ? {...r.GREEN, a: 200} : {...r.RED, a: 200}
-                    r.DrawRectangleLinesEx({
-                        x: this.cursor.x * config.TILE_SIZE,
-                        y: this.cursor.y * config.TILE_SIZE,
-                        width: config.TILE_SIZE,
-                        height: config.TILE_SIZE,
-                    }, 1, color)
-                }
-            }
-        }
+        // // highlight cursor grid element
+        // const showCursorSelect = true;
+        // if (showCursorSelect) {
+        //     let g = this.grid[this.cursor.y]
+        //     if (g) {
+        //         g = g[this.cursor.x]
+        //         if (g) {
+        //             const color = g.isFree ? {...r.GREEN, a: 200} : {...r.RED, a: 200}
+        //             r.DrawRectangleLinesEx({
+        //                 x: this.cursor.x * config.TILE_SIZE,
+        //                 y: this.cursor.y * config.TILE_SIZE,
+        //                 width: config.TILE_SIZE,
+        //                 height: config.TILE_SIZE,
+        //             }, 1, color)
+        //         }
+        //     }
+        // }
     }
 }

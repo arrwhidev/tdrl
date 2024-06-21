@@ -1,8 +1,8 @@
 import r from 'raylib'
 import GameObject from './game_object.js'
 import state from '../game_state.js'
-import config from '../game_config.js'
 import { euclideanDistance } from '../math.js'
+import HealthBar from './health_bar.js'
 
 const WAYPOINTS = [
     { x: 0, y: 30 },
@@ -24,6 +24,7 @@ export default class Enemy extends GameObject {
         this.damage = 2;
         this.speed = 30;
         this.maxHealth = this.health;
+        state.healthBars.push(new HealthBar(this));
     }
 
     update(dt) {
@@ -61,9 +62,9 @@ export default class Enemy extends GameObject {
         // projectile
         r.DrawCircle(this.position.x, this.position.y, this.width, this.color)
 
-        // health bar
-        r.DrawRectangleLines(this.position.x - this.width, this.position.y - this.height - 10, this.width * 2, 3, r.BLACK)
-        r.DrawRectangle(this.position.x - this.width, this.position.y - this.height - 10, (this.health / this.maxHealth) * this.width * 2, 3, r.RED)
+        // // health bar
+        // r.DrawRectangleLines(this.position.x - this.width, this.position.y - this.height - 10, this.width * 2, 3, r.BLACK)
+        // r.DrawRectangle(this.position.x - this.width, this.position.y - this.height - 10, (this.health / this.maxHealth) * this.width * 2, 3, r.RED)
 
         if (state.debug) {
             const rect = this.rect();
