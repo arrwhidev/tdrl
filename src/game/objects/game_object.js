@@ -1,6 +1,6 @@
 import r from 'raylib'
-import state from '../game_state.js'
-import config from '../game_config.js'
+import state from '../../game_state.js'
+import config from '../../game_config.js'
 
 export default class GameObject {
     constructor(position, velocity, width, height, color) {

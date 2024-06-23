@@ -10,9 +10,10 @@ class GameState {
         }
         this.mode = MODE_PLAY;
         this.debug = false
-        this.camera = false
+        this.camera = {}
         this.hud = false
         this.grid = false
+        this.gridCursor = false
         this.tower = false
         this.enemyEmitter = false
         this.healthBars = []

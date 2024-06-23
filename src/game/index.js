@@ -1,12 +1,12 @@
 import r from 'raylib'
-import state, { MODE_LVL_UP, MODE_PLAY, MODE_CREATE_SHOOTER, MODE_UPGRADE_SHOOTER } from './game_state.js'
-import config from './game_config.js'
-import resources from './game_resources.js'
-import Hud from './hud.js'
-import Grid from './grid.js'
+import state, { MODE_LVL_UP, MODE_PLAY, MODE_CREATE_SHOOTER, MODE_UPGRADE_SHOOTER } from '../game_state.js'
+import config from '../game_config.js'
+import resources from '../game_resources.js'
+import Hud from '../hud.js'
+import Grid from '../grid.js'
 import Tower from './objects/tower.js'
 import Shooter from './objects/shooter.js'
-import LevelUpUI from './ui/level_up.js'
+import LevelUpUI from '../ui/level_up.js'
 import EnemyEmitter from './objects/enemy_emitter.js'
 
 // init

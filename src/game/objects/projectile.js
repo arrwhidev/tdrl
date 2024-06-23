@@ -1,10 +1,10 @@
 import r from 'raylib'
 import GameObject from './game_object.js'
-import state from '../game_state.js'
-import config from '../game_config.js'
+import state from '../../game_state.js'
+import config from '../../game_config.js'
 import {
     DEG2RAD,
-} from '../math.js'
+} from '../../math.js'
 
 export default class Projectile extends GameObject {
 

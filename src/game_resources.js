@@ -5,6 +5,9 @@ import path from 'path'
 class GameResources {
 
     load() {
+        console.log('loading resources...')
+        let start = new Date();
+
         this.sprites = []
         this.spriteDict = {}
         this.spriteDict = JSON.parse(fs.readFileSync(`./resources/spritesheets/sprites.json`))
@@ -21,7 +24,12 @@ class GameResources {
         this.music = {}
         this.music.bg = this.loadMusic('bg.wav')
 
-        this.maps = {}
+        this.maps = {
+            dungeon: this.loadMap('dungeon')
+        }
+
+        const diffMs = new Date().getTime() - start.getTime()
+        console.log('finished loading resources, took ' + diffMs + 'ms');
     }
 
     // sprites
@@ -60,7 +68,7 @@ class GameResources {
     // maps
 
     loadMap(name) {
-        this.maps[name] = JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
+        return JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
     }
 
     saveMap(name, data) {
