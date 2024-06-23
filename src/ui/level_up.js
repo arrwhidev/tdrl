@@ -8,19 +8,22 @@ export default class LevelUpUI {
     }
 
     render() {
-        // outer box
+        const spriteSource = {
+            x: 192,
+            y: 96,
+            width: 64,
+            height: 64
+        }
+
         const width = 140;
         const height = width;
         const x = config.WIDTH / 2 - (width / 2)
         const y = config.HEIGHT / 2 - (height / 2)
+
+
         r.DrawTexturePro(
             resources.uispritesheet, 
-            {
-                x: 192,
-                y: 96,
-                width: 64,
-                height: 64,
-            }, { 
+            spriteSource, { 
                 x,
                 y,
                 width,
@@ -28,30 +31,30 @@ export default class LevelUpUI {
             },
             r.Vector2(0,0), 0, r.WHITE)
         
-        const margin = 10;
-        const options = [
-            'Level up tower',
-            'Level up tower',
-            'Add new tower',
-        ];
-        options.forEach((element, i) => {
-            const optionX = x + margin
-            const optionY = y + (height / options.length) * i
+        // const margin = 10;
+        // const options = [
+        //     'Level up tower',
+        //     'Level up tower',
+        //     'Add new tower',
+        // ];
+        // options.forEach((element, i) => {
+        //     const optionX = x + margin
+        //     const optionY = y + (height / options.length) * i
 
-            r.DrawTexturePro(
-                resources.uispritesheet, 
-                {
-                    x: 192,
-                    y: 96,
-                    width: 64,
-                    height: 64,
-                }, { 
-                    x: optionX,
-                    y: optionY,
-                    width: width - margin * 2,
-                    height: 30,
-                },
-                r.Vector2(0,0), 0, r.WHITE)
+        //     r.DrawTexturePro(
+        //         resources.uispritesheet, 
+        //         {
+        //             x: 192,
+        //             y: 96,
+        //             width: 64,
+        //             height: 64,
+        //         }, { 
+        //             x: optionX,
+        //             y: optionY,
+        //             width: width - margin * 2,
+        //             height: 30,
+        //         },
+        //         r.Vector2(0,0), 0, r.WHITE)
 
             // r.DrawTexturePro(
             //     resources.uispritesheet, 
@@ -67,6 +70,6 @@ export default class LevelUpUI {
             //         height: 12,
             //     },
             //     r.Vector2(0,0), 0, r.WHITE)
-        });
+        // });
     }
 }

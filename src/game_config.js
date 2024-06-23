@@ -1,14 +1,14 @@
 class GameConfig {
     constructor() {
         // dimensions
-        this.WIDTH          = 320
-        this.HEIGHT         = 240
-        this.SCALING_FACTOR = 3
+        this.WIDTH          = 640
+        this.HEIGHT         = 480
+        this.SCALING_FACTOR = 2
 
-        // tiles
+        // grid
         this.TILE_SIZE = 20
-        this.NUM_ROWS  = this.HEIGHT / this.TILE_SIZE;
-        this.NUM_COLS  = this.WIDTH / this.TILE_SIZE;
+        this.NUM_ROWS  = 20
+        this.NUM_COLS  = 30
 
         // ui
         this.FONT_SIZE = 12.2;

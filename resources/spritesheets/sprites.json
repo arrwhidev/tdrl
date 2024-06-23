@@ -1,0 +1,72 @@
+{
+    "wall": {
+        "name": "wall",
+        "resource": "dungeon_crawl/dungeon/wall/brick_brown_3.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "floor": {
+        "name": "floor",
+        "resource": "dungeon_crawl/dungeon/floor/cobble_blood_3_old.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "ore": {
+        "name": "ore",
+        "resource": "dungeon_crawl/dungeon/wall/orc_6.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "base": {
+        "name": "base",
+        "resource": "dungeon_crawl/dungeon/altars/gozag_0.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "cursor": {
+        "name": "cursor",
+        "resource": "dungeon_crawl/misc/cursor.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "cursor_green": {
+        "name": "cursor_green",
+        "resource": "dungeon_crawl/misc/cursor_green.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "cursor_red": {
+        "name": "cursor_red",
+        "resource": "dungeon_crawl/misc/cursor_red.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    }
+}

@@ -1,20 +1,74 @@
 import r from 'raylib'
 import fs from 'fs'
+import path from 'path'
 
 class GameResources {
+
     load() {
-        this.fontRegular = r.LoadFont("./resources/fonts/MinecraftRegular-Bmg3.otf")
-        this.fontBold = r.LoadFont("./resources/fonts/MinecraftBold-nMK1.otf")
+        this.sprites = []
+        this.spriteDict = {}
+        this.spriteDict = JSON.parse(fs.readFileSync(`./resources/spritesheets/sprites.json`))
+        for (let key in this.spriteDict) {
+            const spriteConfig = this.spriteDict[key];
+            this.spriteDict[key].texture = this.loadSpriteTexture(spriteConfig.resource)
+            this.sprites.push(key)
+        }
 
-        this.mapjson = JSON.parse(fs.readFileSync('./resources/map.json'))
-        this.spritesheet = r.LoadTexture(`./resources/spritesheets/${this.mapjson.sprite_sheet}`)
+        this.fonts = {}
+        this.fonts.regular = r.LoadFont("./resources/fonts/MinecraftRegular-Bmg3.otf")
+        this.fonts.bold = r.LoadFont("./resources/fonts/MinecraftBold-nMK1.otf")
 
-        this.uispritesheet = r.LoadTexture('./resources/spritesheets/ui/64x64-32x32_gui_Denzi090503-4.png')
+        this.music = {}
+        this.music.bg = this.loadMusic('bg.wav')
 
-        this.bgMusic = r.LoadMusicStream('./resources/music/bg.wav')
-        while(!r.IsMusicReady(this.bgMusic)) {
+        this.maps = {}
+    }
+
+    // sprites
+
+    loadSpriteTexture(spritePath) {
+        return r.LoadTexture('./' + path.join('resources', 'spritesheets', spritePath))
+    }
+
+    getSprite(name) {
+        return this.spriteDict[name]
+    }
+
+    getSpriteNameAtIndex(i) {
+        return this.sprites[i]
+    }
+
+    getSpriteAtIndex(i) {
+        const name = this.getSpriteNameAtIndex(i)
+        return this.spriteDict[name]
+    }
+
+    spriteCount() {
+        return this.sprites.length
+    }
+
+    // music
+
+    loadMusic(name) {
+        const music = r.LoadMusicStream(`./resources/music/${name}`)
+        while(!r.IsMusicReady(music)) {
             console.log('loading music stream...')
         }
+        return music
+    }
+
+    // maps
+
+    loadMap(name) {
+        this.maps[name] = JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
+    }
+
+    saveMap(name, data) {
+        fs.writeFileSync(`./resources/maps/${name}.json`, JSON.stringify(data, 2, 2))
+    }
+
+    getMap(name) {
+        return this.maps[name];
     }
 }
 
