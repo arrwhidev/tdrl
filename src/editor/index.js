@@ -8,7 +8,7 @@ import GridCursor from '../grid_cursor.js'
 import { renderAndScaleTexture } from '../render.js'
 
 // init
-r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "tdrl")
+r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "editor")
 r.SetTargetFPS(0)
 r.InitAudioDevice()
 

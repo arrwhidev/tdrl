@@ -2,7 +2,7 @@ import r from 'raylib'
 import resources from '../game_resources.js'
 import config from '../game_config.js'
 import state from '../game_state.js'
-import Grid from './grid.js'
+import Grid from '../game/grid.js'
 
 export default class EditorGrid extends Grid {
     constructor(mapName) {

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Tower defence raylib",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/game/index.js"
   },
   "author": "Arran White",
   "license": "ISC",

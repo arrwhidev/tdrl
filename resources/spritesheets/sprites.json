@@ -39,6 +39,16 @@
             "height": 32
         }
     },
+    "skeleton_humanoid": {
+        "name": "skeleton_humanoid",
+        "resource": "dungeon_crawl/monster/undead/skeletons/skeleton_humanoid_large_new.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
     "cursor": {
         "name": "cursor",
         "resource": "dungeon_crawl/misc/cursor.png",
