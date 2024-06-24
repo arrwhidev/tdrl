@@ -2,8 +2,8 @@ import r from 'raylib'
 import config from '../game_config.js'
 import state from '../game_state.js'
 import resources from '../game_resources.js'
-import EditGrid from './editgrid.js'
-import EditGridHud from './edithud.js'
+import EditorGrid from './editor_grid.js'
+import Hud from './hud.js'
 import GridCursor from '../grid_cursor.js'
 import { renderAndScaleTexture } from '../render.js'
 
@@ -24,9 +24,9 @@ state.camera.game = camera
 state.camera.hud = hudCamera
 
 // game objects
-const grid = new EditGrid('dungeon')
+const grid = new EditorGrid('dungeon')
 const gridCursor = new GridCursor()
-const hud = new EditGridHud()
+const hud = new Hud()
 
 const gameObjects = []
 gameObjects.push(grid)

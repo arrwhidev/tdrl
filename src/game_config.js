@@ -12,6 +12,9 @@ class GameConfig {
 
         // ui
         this.FONT_SIZE = 12.2;
+
+        //
+        this.ZOOM_SPEED = 0.05;
     }
 }
 
