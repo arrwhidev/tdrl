@@ -1,7 +1,6 @@
 move more attributes and updates to GameObject
 smoothly rotate shooter between targets
 projectiles often miss enemies
-enemy health bar should be rendered on top
 hud
 ui
 coins, pricing, purchasing

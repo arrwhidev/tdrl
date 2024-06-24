@@ -8,14 +8,12 @@ export default class EditGrid {
         this.camera = state.camera.game;
         this.mapName = mapName
         this.rawMap = resources.getMap(mapName)
-        const { rows, cols, map, special } = this.rawMap;
-        this.map = map;
-        this.special = special
+        const { rows, cols, map } = this.rawMap;
         this.rows = rows;
         this.cols = cols;
         this.activeSpriteIndex = 0
-        
-        // init grid
+        this.numLayers = map.layers;
+
         // access via this.grid[row][col]
         this.grid = new Array(rows);
         for (let row = 0; row < rows; row++) {
@@ -29,7 +27,12 @@ export default class EditGrid {
                 // init empty struct
                 this.grid[row][col] = {
                     flatIndex,
-                    spriteName: this.map[flatIndex]
+                    layers: [],
+                }
+                for (let i = 0; i < this.numLayers; i++) {
+                    this.grid[row][col].layers.push({
+                        spriteName: map[`layer${i}`][flatIndex]
+                    })
                 }
             }
         }
@@ -58,7 +61,7 @@ export default class EditGrid {
                 g = g[state.gridCursor.cursor.x]
                 if (g) {
                     // clear
-                    this.grid[state.gridCursor.cursor.y][state.gridCursor.cursor.x].spriteName = ''
+                    this.grid[state.gridCursor.cursor.y][state.gridCursor.cursor.x].spriteName = null
                 }
             }
         } else if (r.IsKeyPressed(r.KEY_ENTER)) {
@@ -87,50 +90,40 @@ export default class EditGrid {
 
     render() {
         // grid sprites
-        for (let row = 0; row < this.rows; row++) {
-            for (let col = 0; col < this.cols; col++) {
-                const g = this.grid[row][col];
-                if (g.spriteName !== '') {
-                    let { texture, rect } = resources.getSprite(g.spriteName)
-                    r.DrawTexturePro(
-                        texture,
-                        rect,
-                        { 
-                            x: col * config.TILE_SIZE,
-                            y: row * config.TILE_SIZE,
-                            width: config.TILE_SIZE,
-                            height: config.TILE_SIZE,
-                        },
-                        { x: 0, y: 0 },
-                        0,
-                        r.WHITE)
-                } else {
-                    r.DrawRectangle(
-                        col * config.TILE_SIZE,
-                        row * config.TILE_SIZE,
-                        config.TILE_SIZE,
-                        config.TILE_SIZE,
-                        r.BLACK)
+        for (let layer = 0; layer < this.numLayers; layer++) {
+            for (let row = 0; row < this.rows; row++) {
+                for (let col = 0; col < this.cols; col++) {
+                    const g = this.grid[row][col].layers[layer];
+                    if (g.spriteName !== null) {
+                        let { texture, rect } = resources.getSprite(g.spriteName)
+                        r.DrawTexturePro(
+                            texture,
+                            rect,
+                            { 
+                                x: col * config.TILE_SIZE,
+                                y: row * config.TILE_SIZE,
+                                width: config.TILE_SIZE,
+                                height: config.TILE_SIZE,
+                            },
+                            { x: 0, y: 0 },
+                            0,
+                            r.WHITE)
+                    } else {
+                        if (layer === 0) {
+                            // on layer = render black if there is no sprite
+                            r.DrawRectangle(
+                                col * config.TILE_SIZE,
+                                row * config.TILE_SIZE,
+                                config.TILE_SIZE,
+                                config.TILE_SIZE,
+                                r.BLACK)
+                        } else {
+                            // on higher layers do not render anything
+                        }
+                    }
                 }
             }
         }
-
-        // map specials
-        Object.keys(this.special).forEach(key => {
-            const sprite = resources.getSprite(key)
-            r.DrawTexturePro(
-                sprite.texture,
-                sprite.rect,
-                { 
-                    x: this.special[key].x * config.TILE_SIZE,
-                    y: this.special[key].y * config.TILE_SIZE,
-                    width: config.TILE_SIZE,
-                    height: config.TILE_SIZE,
-                },
-                { x: 0, y: 0 },
-                0,
-                r.WHITE)
-        })
 
         // grid lines
         for (let row = 0; row < this.rows; row++) {
@@ -140,7 +133,7 @@ export default class EditGrid {
                     y: row * config.TILE_SIZE,
                     width: config.TILE_SIZE,
                     height: config.TILE_SIZE,
-                }, 1, { ...r.BLACK, a: 100 })
+                }, 1, { ...r.WHITE, a: 100 })
             }
         }
 

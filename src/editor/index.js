@@ -5,7 +5,7 @@ import resources from '../game_resources.js'
 import EditGrid from './editgrid.js'
 import EditGridHud from './edithud.js'
 import GridCursor from '../grid_cursor.js'
-import { RenderAndScaleTexture } from '../render.js'
+import { renderAndScaleTexture } from '../render.js'
 
 // init
 r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "tdrl")
@@ -53,7 +53,7 @@ while (!r.WindowShouldClose()) {
 
     // Render game objects to texture at internal resolution
     r.BeginTextureMode(tex)
-    r.ClearBackground(r.RAYWHITE)
+    r.ClearBackground(r.BLACK)
     gameObjects.forEach(item =>  {
         r.BeginMode2D(item.camera)
         item.render()
@@ -62,7 +62,7 @@ while (!r.WindowShouldClose()) {
     r.EndTextureMode()
 
     // Scale to full resolution
-    RenderAndScaleTexture(tex.texture)
+    renderAndScaleTexture(tex.texture)
 }
 
 r.CloseWindow()

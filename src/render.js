@@ -1,9 +1,9 @@
 import r from 'raylib'
 import config from './game_config.js'
 
-export function RenderAndScaleTexture(texture) {
+export function renderAndScaleTexture(texture) {
     r.BeginDrawing()
-    r.ClearBackground(r.RAYWHITE);
+        r.ClearBackground(r.BLACK);
         r.DrawTexturePro(
             texture,
             { x:0, y:0, width: texture.width, height: -texture.height },
