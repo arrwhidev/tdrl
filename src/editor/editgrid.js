@@ -2,40 +2,17 @@ import r from 'raylib'
 import resources from '../game_resources.js'
 import config from '../game_config.js'
 import state from '../game_state.js'
+import { Map } from '../map.js'
 
 export default class EditGrid {
     constructor(mapName) {
         this.camera = state.camera.game;
         this.mapName = mapName
-        this.rawMap = resources.getMap(mapName)
-        const { rows, cols, map } = this.rawMap;
-        this.rows = rows;
-        this.cols = cols;
+
+        const rawMap = resources.getMap(mapName)
+        this.map = new Map(rawMap)
+
         this.activeSpriteIndex = 0
-        this.numLayers = map.layers;
-
-        // access via this.grid[row][col]
-        this.grid = new Array(rows);
-        for (let row = 0; row < rows; row++) {
-            if (!this.grid[row]) {
-                this.grid[row] = new Array(cols);
-            }
-
-            for (let col = 0; col < cols; col++) {
-                const flatIndex = row * cols + col;
-                
-                // init empty struct
-                this.grid[row][col] = {
-                    flatIndex,
-                    layers: [],
-                }
-                for (let i = 0; i < this.numLayers; i++) {
-                    this.grid[row][col].layers.push({
-                        spriteName: map[`layer${i}`][flatIndex]
-                    })
-                }
-            }
-        }
     }
 
     update(dt) {
@@ -90,12 +67,12 @@ export default class EditGrid {
 
     render() {
         // grid sprites
-        for (let layer = 0; layer < this.numLayers; layer++) {
-            for (let row = 0; row < this.rows; row++) {
-                for (let col = 0; col < this.cols; col++) {
-                    const g = this.grid[row][col].layers[layer];
-                    if (g.spriteName !== null) {
-                        let { texture, rect } = resources.getSprite(g.spriteName)
+        for (let layer = 0; layer < this.map.getNumLayers(); layer++) {
+            for (let row = 0; row < this.map.getNumRows(); row++) {
+                for (let col = 0; col < this.map.getNumCols(); col++) {
+                    const tileLayer = this.map.getTileLayer(row, col, layer)
+                    if (tileLayer.spriteName !== null) {
+                        let { texture, rect } = resources.getSprite(tileLayer.spriteName);
                         r.DrawTexturePro(
                             texture,
                             rect,
@@ -124,10 +101,11 @@ export default class EditGrid {
                 }
             }
         }
+      
 
         // grid lines
-        for (let row = 0; row < this.rows; row++) {
-            for (let col = 0; col < this.cols; col++) {
+        for (let row = 0; row < this.map.getNumRows(); row++) {
+            for (let col = 0; col < this.map.getNumCols(); col++) {
                 r.DrawRectangleLinesEx({
                     x: col * config.TILE_SIZE,
                     y: row * config.TILE_SIZE,
@@ -138,25 +116,19 @@ export default class EditGrid {
         }
 
         // highlight cursor grid element
-        let g = this.grid[state.gridCursor.cursor.y]
-        if (g) {
-            g = g[state.gridCursor.cursor.x]
-            if (g) {
-                const sprite = resources.getSprite('cursor')
-                r.DrawTexturePro(
-                    sprite.texture,
-                    sprite.rect,
-                    { 
-                        x: state.gridCursor.cursor.x * config.TILE_SIZE,
-                        y: state.gridCursor.cursor.y * config.TILE_SIZE,
-                        width: config.TILE_SIZE,
-                        height: config.TILE_SIZE,
-                    },
-                    { x: 0, y: 0 },
-                    0,
-                    r.WHITE)
-                }
-        }
+        const sprite = resources.getSprite('cursor')
+        r.DrawTexturePro(
+            sprite.texture,
+            sprite.rect,
+            { 
+                x: state.gridCursor.cursor.x * config.TILE_SIZE,
+                y: state.gridCursor.cursor.y * config.TILE_SIZE,
+                width: config.TILE_SIZE,
+                height: config.TILE_SIZE,
+            },
+            { x: 0, y: 0 },
+            0,
+            r.WHITE);
 
         // current sprite tile at cursor
         const { texture, rect } = resources.getSpriteAtIndex(this.activeSpriteIndex)
