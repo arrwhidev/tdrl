@@ -1,5 +1,6 @@
 import r from 'raylib'
 import config from './game_config.js'
+import resources from './game_resources.js'
 
 export function renderAndScaleTexture(texture) {
     r.BeginDrawing()
@@ -12,4 +13,11 @@ export function renderAndScaleTexture(texture) {
             0.0,
             r.WHITE);
     r.EndDrawing();
+}
+
+export function renderSimpleText(text, x, y) {
+    r.DrawTextPro(
+        resources.fonts.regular, 
+        text, { x, y }, 
+        r.Vector2(0, 0), 0, config.FONT_SIZE, 1, r.WHITE);
 }

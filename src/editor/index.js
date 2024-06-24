@@ -17,7 +17,7 @@ resources.load();
 
 // cameras
 const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
-camera.zoom = 1
+camera.zoom = 0.9
 const hudCamera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 hudCamera.zoom = 1
 state.camera.game = camera
@@ -33,8 +33,13 @@ gameObjects.push(grid)
 gameObjects.push(gridCursor)
 gameObjects.push(hud)
 
+// Keep references to important stuff in global state
 state.grid = grid
 state.gridCursor = gridCursor
+
+// Center the grid in the center of the screen
+camera.offset.x = (config.WIDTH - (grid.map.getNumCols() * config.TILE_SIZE * camera.zoom)) / 2;
+camera.offset.y = (config.HEIGHT - (grid.map.getNumRows() * config.TILE_SIZE * camera.zoom)) / 2;
 
 // game loop
 const tex = r.LoadRenderTexture(config.WIDTH, config.HEIGHT)

@@ -1,3 +1,5 @@
+import resources from "./game_resources.js"
+
 export class TileLayer {
     constructor(spriteName) {
         this.spriteName = spriteName
@@ -20,14 +22,9 @@ export class Tile {
 }
  
 export class Map {
-    constructor(rawMapData) {
+    constructor(mapName, rawMapData) {
+        this.mapName = mapName;
         this.rawMapData = rawMapData;
-
-        console.log(
-            this.getNumRows(),
-            this.getNumCols(),
-            this.getNumLayers(),
-        )
 
         this.map = new Array(this.getNumRows());
         for (let row = 0; row < this.getNumRows(); row++) {
@@ -50,15 +47,15 @@ export class Map {
     }
 
     getNumRows() {
-        return this.rawMapData.rows
+        return this.rawMapData.rows;
     }
 
     getNumCols() {
-        return this.rawMapData.cols
+        return this.rawMapData.cols;
     }
 
     getNumLayers() {
-        return this.rawMapData.map.layers
+        return this.rawMapData.map.layers;
     }
 
     getTile(row, col) {
@@ -67,5 +64,19 @@ export class Map {
 
     getTileLayer(row, col, layer) {
         return this.getTile(row, col).getLayer(layer);
+    }
+
+    persist() {
+        const newMapData = { ...this.rawMapData }
+        for (let row = 0; row < this.getNumRows(); row++) {
+            for (let col = 0; col < this.getNumCols(); col++) {
+                const { flatIndex, layers } = this.getTile(row, col)
+                for(let layer = 0; layer < this.getNumLayers(); layer++) {
+                    newMapData.map[`layer${layer}`][flatIndex] 
+                        = layers[layer].spriteName;
+                }
+            }
+        }
+        resources.saveMap(this.mapName, newMapData)
     }
 }

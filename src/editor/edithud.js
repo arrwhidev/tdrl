@@ -1,7 +1,5 @@
-import r from 'raylib'
-import resources from '../game_resources.js'
-import config from '../game_config.js'
 import state from '../game_state.js'
+import { renderSimpleText } from '../render.js'
 
 export default class EditGridHud {
     constructor() {
@@ -12,6 +10,9 @@ export default class EditGridHud {
 
     render() {
         const mouseCoords = `(${state.gridCursor.cursor.x}, ${state.gridCursor.cursor.y})`;
-        r.DrawTextPro(resources.fonts.regular, mouseCoords, { x: 3, y: 3, }, r.Vector2(0,0), 0, config.FONT_SIZE, 1, r.WHITE);
+        renderSimpleText(mouseCoords, 3, 3);
+
+        const layerInfo = 'layer ' + state.grid.activeLayerIndex;
+        renderSimpleText(layerInfo, 3, 15);
     }
 }
