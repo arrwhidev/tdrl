@@ -7,6 +7,7 @@ import Hud from './ui/hud.js'
 import Grid from './grid.js'
 import GridCursor from '../grid_cursor.js'
 import Enemy from './objects/enemy.js'
+import EnemyEmitter from './objects/enemy_emitter.js'
 
 // init
 r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "tdrl")
@@ -30,13 +31,14 @@ state.camera.hud = hudCamera
 // game objects
 const grid = new Grid('dungeon')
 const gridCursor = new GridCursor()
-const enemy = new Enemy({x:0,y:30}, 20, 20)
 const hud = new Hud()
+const emitter = new EnemyEmitter();
+
 
 const gameObjects = []
 gameObjects.push(grid)
 gameObjects.push(gridCursor)
-gameObjects.push(enemy)
+gameObjects.push(emitter)
 gameObjects.push(hud)
 
 // Keep references to important stuff in global state

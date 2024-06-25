@@ -26,6 +26,8 @@ export default class EditorGrid extends Grid {
             this.map.getTileLayer(row, col, layer).spriteName = spriteName
         }
 
+        
+
         // Keyboard
         if(r.IsKeyPressed(r.KEY_EQUAL)) {
             state.camera.game.zoom += config.ZOOM_SPEED
@@ -52,6 +54,8 @@ export default class EditorGrid extends Grid {
             this.map.getTileLayer(row, col, layer).spriteName = null
         } else if (r.IsKeyPressed(r.KEY_ENTER)) {
             this.map.persist();
+        } else if (r.IsKeyPressed(r.KEY_V)) {
+            this.renderLayers[this.activeLayerIndex] = !this.renderLayers[this.activeLayerIndex];
         }
     }
 

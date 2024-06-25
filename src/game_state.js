@@ -5,16 +5,20 @@ export const MODE_CREATE_SHOOTER  = 3;
 
 class GameState {
     constructor() {
-        this.mode = MODE_PLAY;
+        this.mode = MODE_PLAY
         this.player = {
             coins: 0
         }
-        
         this.camera = {}
         this.debug = false
         this.hud = false
         this.grid = false
         this.gridCursor = false
+
+        this.towers = []
+        this.projectiles = []
+        this.enemyEmitters = []
+
         // this.tower = false
         // this.enemyEmitter = false
         // this.healthBars = []
@@ -23,9 +27,9 @@ class GameState {
         // this.levelUpUI = false
     }
 
-    addCoins(n) {
-        this.player.coins += n
-    }
+    // addCoins(n) {
+    //     this.player.coins += n
+    // }
 
     setMode(mode) {
         this.mode = mode;

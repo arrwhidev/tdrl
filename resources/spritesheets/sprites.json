@@ -49,6 +49,26 @@
             "height": 32
         }
     },
+    "tower_1": {
+        "name": "tower_1",
+        "resource": "dungeon_crawl/dungeon/alters/qazlal_1.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "tower2": {
+        "name": "tower2",
+        "resource": "dungeon_crawl/dungeon/vaults/statue_iron_golem.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
     "cursor": {
         "name": "cursor",
         "resource": "dungeon_crawl/misc/cursor.png",

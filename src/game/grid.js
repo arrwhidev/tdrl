@@ -13,6 +13,7 @@ export default class Grid {
         this.map = new Map(mapName, rawMap)
 
         this.renderGridLines = false
+        this.renderLayers = new Array(true, true)
     }
 
     update(dt) {}
@@ -20,6 +21,8 @@ export default class Grid {
     render() {
         // grid sprites
         for (let layer = 0; layer < this.map.getNumLayers(); layer++) {
+            if (!this.renderLayers[layer]) continue;
+
             for (let row = 0; row < this.map.getNumRows(); row++) {
                 for (let col = 0; col < this.map.getNumCols(); col++) {
                     const tileLayer = this.map.getTileLayer(row, col, layer)
