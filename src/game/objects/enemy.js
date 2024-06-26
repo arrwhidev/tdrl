@@ -3,6 +3,7 @@ import GameObject from './game_object.js'
 import resources from '../../game_resources.js';
 import state from '../../game_state.js';
 import config from '../../game_config.js';
+import { renderSimpleText } from '../../render.js';
 
 class Node {
     constructor(parent, position) {
@@ -132,46 +133,36 @@ export default class Enemy extends GameObject {
             x: gridPosition.x * config.TILE_SIZE,
             y: gridPosition.y * config.TILE_SIZE,
         }, r.Vector2(0, 0), width, height, color);
+        
         this.gridPosition = gridPosition
         this.speed = 30;
         this.scale = 0.8;
         this.health = 10
         this.spriteName = 'skeleton_humanoid';
-
-        // grid target position
-        this.target = {
-            x: 23,
-            y: 13,
-        }
-        this.pathPosition = 0
-
+        this.target = { x: 23, y: 13 }
         this.grid = state.grid.map.map
-        this.path = astar(this.grid, this.gridPosition, this.target);
-        if (this.path.length > 0) {
-            this.nextTile = this.path[this.pathPosition]
-        }
+        this.calculatePath(this.target)
     }
 
     update(dt) {
-        if (this.path.length > 0 && this.nextTile) {
+        if (this.path.length > 0) {
             const roundedX = Math.round(this.position.x)
             const roundedY = Math.round(this.position.y)
-            this.gridPosition.x = roundedX / config.TILE_SIZE;
-            this.gridPosition.y = roundedY / config.TILE_SIZE;
 
-            const nextTileX = this.nextTile.x * config.TILE_SIZE
-            const nextTileY = this.nextTile.y * config.TILE_SIZE
+            this.gridPosition.x = roundedX / config.TILE_SIZE
+            this.gridPosition.y = roundedY / config.TILE_SIZE
 
-            // if we have reached next tile, shift it
+            const nextTile = this.path[0]
+            const nextTileX = nextTile.x * config.TILE_SIZE
+            const nextTileY = nextTile.y * config.TILE_SIZE
+
+            // if we have reached the target tile, shift to next
             if (roundedX === nextTileX && roundedY === nextTileY) {
-                this.pathPosition++
-                this.nextTile = this.path[this.pathPosition]
-                if (!this.nextTile) {
-                    return;
-                }
+                this.path.shift()
+                return
             }
 
-            if (this.grid[this.nextTile.y][this.nextTile.x].layers[0].walkable) {  // Ensure the next step is still walkable
+            if (this.grid[nextTile.y][nextTile.x].layers[0].walkable) {  // Ensure the next step is still walkable
                 const diffVector = {
                     x: nextTileX - this.position.x,
                     y: nextTileY - this.position.y,
@@ -190,14 +181,13 @@ export default class Enemy extends GameObject {
                 this.position.x += this.velocity.x * dt;
                 this.position.y += this.velocity.y * dt;
             } else {
-                // Recalculate the path if the next step is not walkable
-                this.path = astar(this.grid, this.gridPosition, this.target);
-                this.pathPosition = 0
-                if (this.path.length > 0) {
-                    this.nextTile = this.path[this.pathPosition]
-                }
+                this.calculatePath(this.target)
             }
         }
+    }
+
+    calculatePath(target) {
+        this.path = astar(this.grid, this.gridPosition, target)
     }
 
     render() {
