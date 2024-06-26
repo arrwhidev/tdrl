@@ -65,15 +65,17 @@ function astar(maze, start, end) {
         // Generate children
         const children = [];
         const adjacentSquares = [
-            [0, -1], [0, 1], [-1, 0], [1, 0], 
-            [-1, -1], [-1, 1], [1, -1], [1, 1]
+            {x: -1, y: 0}, // left
+            {x: 1, y: 0}, // right
+            {x: 0, y: -1}, // above
+            {x: 0, y: 1}, // below
         ];
 
         for (const newPosition of adjacentSquares) {
             // Get node position
             const nodePosition = {
-                x: currentNode.position.x + newPosition[1],
-                y: currentNode.position.y + newPosition[0]
+                x: currentNode.position.x + newPosition.x,
+                y: currentNode.position.y + newPosition.y
             }
 
             const numRows = maze.length;
@@ -144,7 +146,6 @@ export default class Enemy extends GameObject {
 
         this.grid = state.grid.map.map
         this.path = astar(this.grid, this.gridPosition, this.target);
-        console.log(this.path.length)
         if (this.path.length > 0) {
             this.nextTile = this.path[this.pathPosition]
         }
