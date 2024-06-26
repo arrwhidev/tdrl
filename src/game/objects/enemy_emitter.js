@@ -1,6 +1,7 @@
 import r from 'raylib'
 import Enemy from './enemy.js'
 import config from '../../game_config.js';
+import state from '../../game_state.js';
 
 export default class EnemyEmitter {
 
@@ -8,7 +9,7 @@ export default class EnemyEmitter {
         this.capacity = capacity; // total enemies that this emitter can emit
         this.maxAlive = maxAlive; // total enemies that are allowed to be alive
         this.spawnTimer = 0
-        this.spawnRate = 0.2
+        this.spawnRate = 0.05
         this.enemies = []
     }
 
@@ -47,18 +48,21 @@ export default class EnemyEmitter {
         // top (0), bottom (1), left (2), right (3)
         const side = r.GetRandomValue(0, 4);
 
+        const maxY = state.grid.map.getNumRows() * config.TILE_SIZE
+        const maxX = state.grid.map.getNumCols() * config.TILE_SIZE
+
         if (side === 0) { // top
-            x = r.GetRandomValue(0, config.WIDTH)
+            x = r.GetRandomValue(0, maxX)
             y = 0
         } else if (side === 1) { // bottom
-            x = r.GetRandomValue(0, config.WIDTH)
-            y = config.HEIGHT
+            x = r.GetRandomValue(0, maxX)
+            y = maxY
         } else if (side === 2) { // left
             x = 0
-            y = r.GetRandomValue(0, config.HEIGHT)
+            y = r.GetRandomValue(0, maxY)
         } else if (side === 3) { // right
-            x = config.WIDTH
-            y = r.GetRandomValue(0, config.HEIGHT)
+            x = maxX
+            y = r.GetRandomValue(0, maxY)
         }
 
         return new Enemy({ x, y }, 20, 20);
