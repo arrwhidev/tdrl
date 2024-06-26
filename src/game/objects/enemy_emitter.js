@@ -50,18 +50,19 @@ export default class EnemyEmitter {
 
         const maxY = state.grid.map.getNumRows() * config.TILE_SIZE
         const maxX = state.grid.map.getNumCols() * config.TILE_SIZE
+        const buffer = 20
 
         if (side === 0) { // top
             x = r.GetRandomValue(0, maxX)
-            y = 0
+            y = 0 - buffer
         } else if (side === 1) { // bottom
             x = r.GetRandomValue(0, maxX)
-            y = maxY
+            y = maxY + buffer
         } else if (side === 2) { // left
-            x = 0
+            x = 0 - buffer
             y = r.GetRandomValue(0, maxY)
         } else if (side === 3) { // right
-            x = maxX
+            x = maxX + buffer
             y = r.GetRandomValue(0, maxY)
         }
 
