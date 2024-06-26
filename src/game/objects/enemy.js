@@ -22,21 +22,6 @@ class Node {
     }
 }
 
-// class Node {
-//     constructor(parent = null, position = null) {
-//         this.parent = parent;
-//         this.position = position;
-
-//         this.g = 0;
-//         this.h = 0;
-//         this.f = 0;
-//     }
-
-//     isEqual(other) {
-//         return this.position[0] === other.position[0] && this.position[1] === other.position[1];
-//     }
-// }
-
 function astar(maze, start, end) {
     // Create start and end node
     const startNode = new Node(null, start);
