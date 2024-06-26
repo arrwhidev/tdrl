@@ -5,7 +5,7 @@ import state from '../../game_state.js';
 
 export default class EnemyEmitter {
 
-    constructor(capacity = 10, maxAlive = 10) {
+    constructor(capacity = 1, maxAlive = 1) {
         this.capacity = capacity; // total enemies that this emitter can emit
         this.maxAlive = maxAlive; // total enemies that are allowed to be alive
         this.spawnTimer = 0

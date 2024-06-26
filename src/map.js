@@ -5,6 +5,11 @@ export class TileLayer {
         this.spriteName = spriteName
         this.walkable = spriteName === 'floor'
     }
+
+    setSpriteName(spriteName) {
+        this.spriteName = spriteName
+        this.walkable = spriteName === 'floor'
+    }
 }
 
 export class Tile {

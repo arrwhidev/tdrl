@@ -3,7 +3,6 @@ import GameObject from './game_object.js'
 import resources from '../../game_resources.js';
 import state from '../../game_state.js';
 import config from '../../game_config.js';
-import { renderSimpleText } from '../../render.js';
 
 class Node {
     constructor(parent, position) {
@@ -145,6 +144,7 @@ export default class Enemy extends GameObject {
 
         this.grid = state.grid.map.map
         this.path = astar(this.grid, this.gridPosition, this.target);
+        console.log(this.path.length)
         if (this.path.length > 0) {
             this.nextTile = this.path[this.pathPosition]
         }
@@ -154,6 +154,10 @@ export default class Enemy extends GameObject {
         if (this.path.length > 0) {
             const roundedX = Math.round(this.position.x)
             const roundedY = Math.round(this.position.y)
+
+            this.gridPosition.x = roundedX / config.TILE_SIZE;
+            this.gridPosition.y = roundedY / config.TILE_SIZE;
+
             const nextTileX = this.nextTile.x * config.TILE_SIZE
             const nextTileY = this.nextTile.y * config.TILE_SIZE
 
@@ -186,7 +190,11 @@ export default class Enemy extends GameObject {
                 this.position.y += this.velocity.y * dt;
             } else {
                 // Recalculate the path if the next step is not walkable
-                this.path = astar(this.grid, this.position, this.target);
+                this.path = astar(this.grid, this.gridPosition, this.target);
+                this.pathPosition = 0
+                if (this.path.length > 0) {
+                    this.nextTile = this.path[this.pathPosition]
+                }
             }
         }
     }

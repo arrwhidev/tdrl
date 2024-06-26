@@ -25,7 +25,7 @@ export default class EditorGrid extends Grid {
             const spriteName = resources.getSpriteNameAtIndex(this.activeSpriteIndex)
             const tileLayer = this.map.getTileLayer(row, col, layer);
             if (tileLayer) {
-                tileLayer.spriteName = spriteName;
+                tileLayer.setSpriteName(spriteName)
             }
         }
 
