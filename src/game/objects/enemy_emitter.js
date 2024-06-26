@@ -5,11 +5,11 @@ import state from '../../game_state.js';
 
 export default class EnemyEmitter {
 
-    constructor(capacity = 1000, maxAlive = 1000) {
+    constructor(capacity = 10, maxAlive = 10) {
         this.capacity = capacity; // total enemies that this emitter can emit
         this.maxAlive = maxAlive; // total enemies that are allowed to be alive
         this.spawnTimer = 0
-        this.spawnRate = 0.05
+        this.spawnRate = 0.2
         this.enemies = []
     }
 
@@ -22,7 +22,9 @@ export default class EnemyEmitter {
                 this.capacity--;
 
                 const enemy = this.createEnemy();
-                if (enemy) this.enemies.push(enemy);
+                if (enemy) {
+                    this.enemies.push(enemy);
+                }
             }
         }
 
@@ -32,6 +34,7 @@ export default class EnemyEmitter {
                 state.addCoins(1)
             }
         });
+
         this.enemies = this.enemies.filter(enemy => enemy.health > 0);
     }
 
@@ -47,10 +50,9 @@ export default class EnemyEmitter {
         // choose a random side
         // top (0), bottom (1), left (2), right (3)
         const side = r.GetRandomValue(0, 4);
-
-        const maxY = state.grid.map.getNumRows() * config.TILE_SIZE
-        const maxX = state.grid.map.getNumCols() * config.TILE_SIZE
-        const buffer = 20
+        const maxY = state.grid.map.getNumRows()
+        const maxX = state.grid.map.getNumCols()
+        const buffer = 0
 
         if (side === 0) { // top
             x = r.GetRandomValue(0, maxX)
@@ -65,7 +67,7 @@ export default class EnemyEmitter {
             x = maxX + buffer
             y = r.GetRandomValue(0, maxY)
         }
-
+        console.log('create enemy at ', x, y)
         return new Enemy({ x, y }, 20, 20);
     }
 }

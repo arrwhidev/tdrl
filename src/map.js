@@ -3,6 +3,7 @@ import resources from "./game_resources.js"
 export class TileLayer {
     constructor(spriteName) {
         this.spriteName = spriteName
+        this.walkable = spriteName === 'floor'
     }
 }
 
