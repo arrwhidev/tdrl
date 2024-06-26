@@ -68,17 +68,7 @@ class GameResources {
     // maps
 
     loadMap(name) {
-        const map = JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
-
-        // validation
-        for (let layerIndex = 0; layerIndex < map.map.layers; layerIndex++) {
-            const layer = map.map[`layer${layerIndex}`];
-            if (layer.length !== map.cols * map.rows) {
-                throw new Error(`Map validation failed. Layer ${layerIndex} has a length of ${layer.length} but expected ${map.rows * map.cols}.`)
-            }
-        }
-
-        return map
+        return JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
     }
 
     saveMap(name, data) {

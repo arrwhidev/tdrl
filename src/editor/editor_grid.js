@@ -7,7 +7,7 @@ import Grid from '../game/grid.js'
 export default class EditorGrid extends Grid {
     constructor(mapName) {
         super(mapName)
-
+        this.renderGridLines = true
         this.activeSpriteIndex = 0
         this.activeLayerIndex = 0
     }
@@ -23,10 +23,11 @@ export default class EditorGrid extends Grid {
             const col = state.gridCursor.cursor.x
             const layer = this.activeLayerIndex
             const spriteName = resources.getSpriteNameAtIndex(this.activeSpriteIndex)
-            this.map.getTileLayer(row, col, layer).spriteName = spriteName
+            const tileLayer = this.map.getTileLayer(row, col, layer);
+            if (tileLayer) {
+                tileLayer.spriteName = spriteName;
+            }
         }
-
-        
 
         // Keyboard
         if(r.IsKeyPressed(r.KEY_EQUAL)) {

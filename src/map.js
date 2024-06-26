@@ -38,7 +38,7 @@ export class Map {
                 this.map[row][col] = new Tile(flatIndex, this.getNumLayers())
 
                 for (let i = 0; i < this.getNumLayers(); i++) {
-                    const spriteName = this.rawMapData.map[`layer${i}`][flatIndex];
+                    const spriteName = this.rawMapData.map[`layer${i}`][flatIndex] || null;
                     const tile = this.getTile(row, col);
                     tile.setLayer(i, new TileLayer(spriteName));
                 }
@@ -59,11 +59,13 @@ export class Map {
     }
 
     getTile(row, col) {
-        return this.map[row][col];
+        const r = this.map[row];
+        return (r) ? r[col] : null;
     }
 
     getTileLayer(row, col, layer) {
-        return this.getTile(row, col).getLayer(layer);
+        const tile = this.getTile(row, col);
+        return (tile) ? tile.getLayer(layer) : null;
     }
 
     persist() {
