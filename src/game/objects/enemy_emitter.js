@@ -45,7 +45,7 @@ export default class EnemyEmitter {
     }
 
     createEnemy() {
-        let x, y;
+        let x = 0, y = 0;
 
         // choose a random side
         // top (0), bottom (1), left (2), right (3)

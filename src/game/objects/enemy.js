@@ -5,99 +5,140 @@ import state from '../../game_state.js';
 import config from '../../game_config.js';
 import { renderSimpleText } from '../../render.js';
 
-class PriorityQueue {
-    constructor() {
-        this.elements = [];
+class Node {
+    constructor(parent, position) {
+        this.parent = parent
+        this.position = position
+        this.g = 0
+        this.h = 0
+        this.f = 0
     }
 
-    enqueue(element, priority) {
-        this.elements.push({ element, priority });
-        this.elements.sort((a, b) => a.priority - b.priority);
-    }
-
-    dequeue() {
-        return this.elements.shift().element;
-    }
-
-    isEmpty() {
-        return this.elements.length === 0;
+    isEqual(node) {
+        return (
+            node.position.x === this.position.x &&
+            node.position.y === this.position.y
+        )
     }
 }
 
-function heuristic(a, b) {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);  // Manhattan distance
-}
+// class Node {
+//     constructor(parent = null, position = null) {
+//         this.parent = parent;
+//         this.position = position;
 
-function aStar(start, goal, grid) {
-    const openSet = new PriorityQueue();
-    openSet.enqueue(start, 0);
+//         this.g = 0;
+//         this.h = 0;
+//         this.f = 0;
+//     }
 
-    const cameFrom = new Map();
+//     isEqual(other) {
+//         return this.position[0] === other.position[0] && this.position[1] === other.position[1];
+//     }
+// }
 
-    const gScore = new Map();
-    gScore.set(start, 0);
+function astar(maze, start, end) {
+    // Create start and end node
+    const startNode = new Node(null, start);
+    const endNode = new Node(null, end);
 
-    const fScore = new Map();
-    fScore.set(start, heuristic(start, goal));
+    // Initialize both open and closed list
+    const openList = [];
+    const closedList = [];
 
-    let i = 0
-    while (!openSet.isEmpty()) {
-        console.log('tick', i++)
-        const current = openSet.dequeue();
+    // Add the start node
+    openList.push(startNode);
 
-        if (current.x === goal.x && current.y === goal.y) {
-            return reconstructPath(cameFrom, current);
-        }
+    // Loop until you find the end
+    while (openList.length > 0) {
+        // Get the current node
+        let currentNode = openList[0];
+        let currentIndex = 0;
 
-        for (const neighbor of getNeighbors(current, grid)) {
-            const tentativeGScore = gScore.get(current) + 1;
-
-            if (!gScore.has(neighbor) || tentativeGScore < gScore.get(neighbor)) {
-                cameFrom.set(neighbor, current);
-                gScore.set(neighbor, tentativeGScore);
-                fScore.set(neighbor, tentativeGScore + heuristic(neighbor, goal));
-
-                if (!openSet.elements.some(element => element.element === neighbor)) {
-                    openSet.enqueue(neighbor, fScore.get(neighbor));
-                }
+        // find the smallest f value node in the open list
+        for (let index = 0; index < openList.length; index++) {
+            if (openList[index].f < currentNode.f) {
+                currentNode = openList[index];
+                currentIndex = index;
             }
         }
-    }
 
-    return [];  // No path found
-}
+        // Pop current off open list, add to closed list
+        openList.splice(currentIndex, 1);
+        closedList.push(currentNode);
 
-function getNeighbors(node, grid) {
-    const neighbors = [];
-    const directions = [
-        { x: 1, y: 0 }, { x: -1, y: 0 },
-        { x: 0, y: 1 }, { x: 0, y: -1 }
-    ];
+        // Found the goal
+        if (currentNode.isEqual(endNode)) {
+            const path = [];
+            let current = currentNode;
+            while (current !== null) {
+                path.push(current.position);
+                current = current.parent;
+            }
+            return path.reverse(); // Return reversed path
+        }
 
-    for (const direction of directions) {
-        const neighborX = node.x + direction.x;
-        const neighborY = node.y + direction.y;
+        // Generate children
+        const children = [];
+        const adjacentSquares = [
+            [0, -1], [0, 1], [-1, 0], [1, 0], 
+            [-1, -1], [-1, 1], [1, -1], [1, 1]
+        ];
 
-        if (neighborX >= 0 && neighborX < grid[0].length &&
-            neighborY >= 0 && neighborY < grid.length &&
-            grid[neighborY][neighborX].layers[0].walkable) {  // Assuming 0 is walkable and 1 is non-walkable
-            neighbors.push({ x: neighborX, y: neighborY });
+        for (const newPosition of adjacentSquares) {
+            // Get node position
+            const nodePosition = {
+                x: currentNode.position.x + newPosition[1],
+                y: currentNode.position.y + newPosition[0]
+            }
+
+            const numRows = maze.length;
+            const numCols = maze[0].length;
+
+            // Make sure within range
+            if (nodePosition.y > (numRows - 1) || nodePosition.y < 0 ||
+                nodePosition.x > (numCols - 1) || nodePosition.x < 0) {
+                continue;
+            }
+
+            // Make sure walkable terrain
+            if (!maze[nodePosition.y][nodePosition.x].layers[0].walkable) {
+                continue;
+            }
+
+            // Create new node
+            const newNode = new Node(currentNode, nodePosition);
+
+            // Append
+            children.push(newNode);
+        }
+
+        // Loop through children
+        for (const child of children) {
+            // Child is on the closed list
+            if (closedList.some(closedChild => child.isEqual(closedChild))) {
+                continue;
+            }
+
+            // Create the f, g, and h values
+            child.g = currentNode.g + 1;
+            child.h = Math.pow(child.position.y - endNode.position.y, 2) + 
+                      Math.pow(child.position.x - endNode.position.x, 2);
+            child.f = child.g + child.h;
+
+            // Child is already in the open list
+            if (openList.some(openNode => child.isEqual(openNode) && child.g > openNode.g)) {
+                continue;
+            }
+
+            // Add the child to the open list
+            openList.push(child);
         }
     }
 
-    return neighbors;
+    return [];
 }
 
-function reconstructPath(cameFrom, current) {
-    const totalPath = [current];
-
-    while (cameFrom.has(current)) {
-        current = cameFrom.get(current);
-        totalPath.unshift(current);
-    }
-
-    return totalPath;
-}
 
 export default class Enemy extends GameObject {
     constructor(gridPosition, width, height, color) {
@@ -105,7 +146,7 @@ export default class Enemy extends GameObject {
             y: gridPosition.y * config.TILE_SIZE,
         }, r.Vector2(0, 0), width, height, color);
         this.gridPosition = gridPosition
-        this.speed = 10;
+        this.speed = 30;
         this.scale = 0.8;
         this.health = 10
         this.spriteName = 'skeleton_humanoid';
@@ -115,13 +156,12 @@ export default class Enemy extends GameObject {
             x: 23,
             y: 13,
         }
+        this.pathPosition = 0
 
         this.grid = state.grid.map.map
-        this.path = aStar(this.gridPosition, this.target, this.grid);
-        console.log('path calculated, steps:', this.path.length)
-
+        this.path = astar(this.grid, this.gridPosition, this.target);
         if (this.path.length > 0) {
-            this.nextTile = this.path.shift();
+            this.nextTile = this.path[this.pathPosition]
         }
     }
 
@@ -134,7 +174,11 @@ export default class Enemy extends GameObject {
 
             // if we have reached next tile, shift it
             if (roundedX === nextTileX && roundedY === nextTileY) {
-                this.nextTile = this.path.shift();
+                this.pathPosition++
+                this.nextTile = this.path[this.pathPosition]
+                if (!this.nextTile) {
+                    return;
+                }
             }
 
             if (this.grid[this.nextTile.y][this.nextTile.x].layers[0].walkable) {  // Ensure the next step is still walkable
@@ -157,7 +201,7 @@ export default class Enemy extends GameObject {
                 this.position.y += this.velocity.y * dt;
             } else {
                 // Recalculate the path if the next step is not walkable
-                this.path = aStar(this.position, this.target, this.grid);
+                this.path = astar(this.grid, this.position, this.target);
             }
         }
     }
@@ -176,6 +220,16 @@ export default class Enemy extends GameObject {
             { x: 0, y: 0 },
             0,
             r.WHITE)
+        
+        for (let i = 0; i < this.path.length; i++) {
+            const prev = this.path[i-1];
+            const now = this.path[i];
+            if (prev && now) {
+                r.DrawLine(
+                    prev.x * config.TILE_SIZE, prev.y * config.TILE_SIZE, now.x * config.TILE_SIZE, now.y * config.TILE_SIZE, r.GREEN
+                )
+            }
+        }
     }
 
     rect() {
