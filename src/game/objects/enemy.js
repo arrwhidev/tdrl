@@ -128,7 +128,8 @@ function astar(maze, start, end) {
 
 export default class Enemy extends GameObject {
     constructor(gridPosition, width, height, color) {
-        super({x: gridPosition.x * config.TILE_SIZE,
+        super({
+            x: gridPosition.x * config.TILE_SIZE,
             y: gridPosition.y * config.TILE_SIZE,
         }, r.Vector2(0, 0), width, height, color);
         this.gridPosition = gridPosition
@@ -152,10 +153,9 @@ export default class Enemy extends GameObject {
     }
 
     update(dt) {
-        if (this.path.length > 0) {
+        if (this.path.length > 0 && this.nextTile) {
             const roundedX = Math.round(this.position.x)
             const roundedY = Math.round(this.position.y)
-
             this.gridPosition.x = roundedX / config.TILE_SIZE;
             this.gridPosition.y = roundedY / config.TILE_SIZE;
 
@@ -215,13 +215,15 @@ export default class Enemy extends GameObject {
             0,
             r.WHITE)
         
-        for (let i = 0; i < this.path.length; i++) {
-            const prev = this.path[i-1];
-            const now = this.path[i];
-            if (prev && now) {
-                r.DrawLine(
-                    prev.x * config.TILE_SIZE, prev.y * config.TILE_SIZE, now.x * config.TILE_SIZE, now.y * config.TILE_SIZE, r.GREEN
-                )
+        if (state.debug) {
+            for (let i = 0; i < this.path.length; i++) {
+                const prev = this.path[i-1];
+                const now = this.path[i];
+                if (prev && now) {
+                    r.DrawLine(
+                        prev.x * config.TILE_SIZE, prev.y * config.TILE_SIZE, now.x * config.TILE_SIZE, now.y * config.TILE_SIZE, r.GREEN
+                    )
+                }
             }
         }
     }
