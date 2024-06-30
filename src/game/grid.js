@@ -21,6 +21,9 @@ export default class Grid {
         if (r.GetMouseWheelMove() != 0) {
             state.camera.game.zoom += r.GetMouseWheelMove() * config.ZOOM_SPEED
         }
+        if (r.IsMouseButtonPressed(r.MOUSE_BUTTON_LEFT)) {
+            state.createTowerAtCursor()
+        }
 
         // pan right
         if (r.GetMouseX() > config.WIDTH * config.SCALING_FACTOR) {

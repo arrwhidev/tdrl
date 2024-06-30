@@ -1,14 +1,23 @@
+
 import resources from "./game_resources.js"
 
 export class TileLayer {
     constructor(spriteName) {
-        this.spriteName = spriteName
-        this.walkable = spriteName === 'floor'
+        this.setSpriteName(spriteName)
     }
 
     setSpriteName(spriteName) {
         this.spriteName = spriteName
         this.walkable = spriteName === 'floor'
+    }
+
+    canCreate(type) {
+        if (type === 'tower') {
+            // Towers can only be created on walls
+            return this.spriteName === 'wall'; 
+        }
+
+        return false;
     }
 }
 

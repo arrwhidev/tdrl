@@ -1,10 +1,11 @@
 import r from 'raylib'
-import state from '../game_state.js'
+import state, { MODE_PLAY } from '../game_state.js'
 import config from '../game_config.js'
 import resources from '../game_resources.js'
 import { renderAndScaleTexture } from '../render.js'
 import Hud from './ui/hud.js'
 import Grid from './grid.js'
+import EditorGrid from '../editor/editor_grid.js'
 import GridCursor from '../grid_cursor.js'
 import EnemyEmitter from './objects/enemy_emitter.js'
 
@@ -21,7 +22,7 @@ r.PlayMusicStream(resources.music.bg)
 
 // cameras
 const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
-camera.zoom = 0.6
+camera.zoom = 1
 const hudCamera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 hudCamera.zoom = 1
 state.camera.game = camera
@@ -31,13 +32,14 @@ state.camera.hud = hudCamera
 const grid = new Grid('dungeon')
 const gridCursor = new GridCursor()
 const hud = new Hud()
-const emitter = new EnemyEmitter();
 
+state.enemyEmitters.push(new EnemyEmitter())
 
 const gameObjects = []
 gameObjects.push(grid)
+gameObjects.push(state.enemyEmitters)
+gameObjects.push(state.towers)
 gameObjects.push(gridCursor)
-gameObjects.push(emitter)
 gameObjects.push(hud)
 
 // Keep references to important stuff in global state
@@ -49,11 +51,29 @@ while (!r.WindowShouldClose()) {
     const dt = r.GetFrameTime()
 
     /**
+     * Main Input
+     */
+
+    if (r.IsKeyPressed(r.KEY_SPACE)) {
+        state.togglePaused()
+    } else if (r.IsKeyReleased(r.KEY_D)) {
+        state.toggleDebug()
+    }
+
+    /**
      * Update
      */
 
     r.UpdateMusicStream(resources.music.bg);
-    gameObjects.forEach(o => o.update(dt))
+    if (state.mode === MODE_PLAY) {
+        gameObjects.forEach(o => {
+            if (Array.isArray(o)) {
+                o.forEach(oo => oo.update(dt))
+            } else {
+                o.update(dt)
+            }
+        })
+    }
 
     /**
      * Render
@@ -64,7 +84,11 @@ while (!r.WindowShouldClose()) {
     r.ClearBackground(r.BLACK)
     gameObjects.forEach(item =>  {
         r.BeginMode2D(item.camera || state.camera.game)
-        item.render()
+        if (Array.isArray(item)) {
+            item.forEach(oo => oo.render())
+        } else {
+            item.render()
+        }
         r.EndMode2D()
     })
     r.EndTextureMode()

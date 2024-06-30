@@ -14,6 +14,9 @@ export default class Hud {
     render() {
         [
             `${r.GetFPS()}`,
+            `grid (${state.gridCursor.cursor.x}, ${state.gridCursor.cursor.y})`,
+            // `mouse (${state.gridCursor.mouse.x}, ${state.gridCursor.mouse.y})`,
+            // `norm (${state.gridCursor.getCursorNormalizedX()}, ${state.gridCursor.getCursorNormalizedY()})`,
         ].forEach(this.renderText);
     }
 

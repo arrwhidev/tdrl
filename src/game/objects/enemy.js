@@ -126,14 +126,13 @@ function astar(maze, start, end) {
     return [];
 }
 
-
 export default class Enemy extends GameObject {
     constructor(gridPosition, width, height, color) {
         super({
             x: gridPosition.x * config.TILE_SIZE,
             y: gridPosition.y * config.TILE_SIZE,
         }, r.Vector2(0, 0), width, height, color);
-        
+
         this.gridPosition = gridPosition
         this.speed = 30;
         this.scale = 0.8;

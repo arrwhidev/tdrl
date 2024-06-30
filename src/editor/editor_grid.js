@@ -7,7 +7,7 @@ import Grid from '../game/grid.js'
 export default class EditorGrid extends Grid {
     constructor(mapName) {
         super(mapName)
-        this.renderGridLines = true
+        this.renderGridLines = false
         this.activeSpriteIndex = 0
         this.activeLayerIndex = 0
     }
@@ -57,6 +57,8 @@ export default class EditorGrid extends Grid {
             this.map.persist();
         } else if (r.IsKeyPressed(r.KEY_V)) {
             this.renderLayers[this.activeLayerIndex] = !this.renderLayers[this.activeLayerIndex];
+        } else if (r.IsKeyPressed(r.KEY_G)) {
+            this.renderGridLines = !this.renderGridLines
         }
     }
 
