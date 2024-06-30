@@ -205,6 +205,7 @@ export default class Enemy extends GameObject {
             r.WHITE)
         
         if (state.debug) {
+            // draw path
             for (let i = 0; i < this.path.length; i++) {
                 const prev = this.path[i-1];
                 const now = this.path[i];
@@ -214,15 +215,14 @@ export default class Enemy extends GameObject {
                     )
                 }
             }
-        }
-    }
+            
+            // draw bounding rect
+            const rect = this.rect()
+            r.DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, r.GREEN)
 
-    rect() {
-        return {
-            x: this.position.x - this.width,
-            y: this.position.y - this.height,
-            width: this.width * 2,
-            height: this.height * 2,
+            // draw center
+            const center = this.getCenter()
+            r.DrawCircle(center.x, center.y, 1, r.GREEN)
         }
     }
 }

@@ -17,7 +17,7 @@ r.InitAudioDevice()
 resources.load();
 
 // music
-r.PlayMusicStream(resources.music.bg)
+// r.PlayMusicStream(resources.music.bg)
 
 // cameras
 const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
@@ -38,6 +38,7 @@ const gameObjects = []
 gameObjects.push(grid)
 gameObjects.push(state.enemyEmitters)
 gameObjects.push(state.towers)
+gameObjects.push(state.projectiles)
 gameObjects.push(gridCursor)
 gameObjects.push(hud)
 

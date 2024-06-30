@@ -20,4 +20,4 @@ export function renderSimpleText(text, x, y) {
         resources.fonts.regular, 
         text, { x, y }, 
         r.Vector2(0, 0), 0, config.FONT_SIZE, 1, r.WHITE);
-}
+    }

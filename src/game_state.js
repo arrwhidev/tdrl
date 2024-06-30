@@ -1,4 +1,4 @@
-import Tower from './game/objects/tower2.js'
+import Tower from './game/objects/tower.js'
 import config from './game_config.js';
 
 export const MODE_PLAY  = 0;
@@ -67,7 +67,7 @@ class GameState {
             console.log(`Creating tower at row: ${tower.position.y} col ${tower.position.x}`)
             this.towers.push(tower)
         } else {
-            console.warn(`Can't create tower at row: ${y} col ${x}`)
+            console.log(`Can't create tower at row: ${y} col ${x}`)
         }
     }
 

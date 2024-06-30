@@ -29,18 +29,19 @@ export default class Projectile extends GameObject {
 
     render() {
         r.DrawCircle(this.position.x, this.position.y, this.width, r.WHITE)
+
+        if (config.debug) {
+            // draw bounding rect
+            const rect = this.rect()
+            r.DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, r.GREEN)
+
+            // draw center
+            const center = this.getCenter()
+            r.DrawCircle(center.x, center.y, 1, r.GREEN)
+        }
     }
 
     kill() {
         this.alive = false
-    }
-
-    rect() {
-        return {
-            x: this.position.x, 
-            y: this.position.y,
-            width: this.width,
-            height: this.height,
-        }
     }
 }

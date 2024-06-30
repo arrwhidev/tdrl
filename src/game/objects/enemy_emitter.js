@@ -49,24 +49,24 @@ export default class EnemyEmitter {
 
         // choose a random side
         // top (0), bottom (1), left (2), right (3)
-        const side = r.GetRandomValue(0, 4);
-        const maxY = state.grid.map.getNumRows()
-        const maxX = state.grid.map.getNumCols()
-        const buffer = 0
+        // const side = r.GetRandomValue(0, 4);
+        // const maxY = state.grid.map.getNumRows()
+        // const maxX = state.grid.map.getNumCols()
+        // const buffer = 0
 
-        if (side === 0) { // top
-            x = r.GetRandomValue(0, maxX)
-            y = 0 - buffer
-        } else if (side === 1) { // bottom
-            x = r.GetRandomValue(0, maxX)
-            y = maxY + buffer
-        } else if (side === 2) { // left
-            x = 0 - buffer
-            y = r.GetRandomValue(0, maxY)
-        } else if (side === 3) { // right
-            x = maxX + buffer
-            y = r.GetRandomValue(0, maxY)
-        }
+        // if (side === 0) { // top
+        //     x = r.GetRandomValue(0, maxX)
+        //     y = 0 - buffer
+        // } else if (side === 1) { // bottom
+        //     x = r.GetRandomValue(0, maxX)
+        //     y = maxY + buffer
+        // } else if (side === 2) { // left
+        //     x = 0 - buffer
+        //     y = r.GetRandomValue(0, maxY)
+        // } else if (side === 3) { // right
+        //     x = maxX + buffer
+        //     y = r.GetRandomValue(0, maxY)
+        // }
         console.log('create enemy at ', x, y)
         return new Enemy({ x, y }, 20, 20);
     }
