@@ -58,11 +58,19 @@ export default class Tower extends GameObject {
                 return;
             }
 
-            // enemy is within reach, attack it
+            // enemy is within reach.
+            
+            // rotate towards it
             let dx = this.target.position.x - this.position.x;
             let dy = this.target.position.y - this.position.y;
-            this.angle = Math.atan2(dy, dx) * RAD2DEG;
+            const targetAngle = Math.atan2(dy, dx) * RAD2DEG;
+            if (targetAngle < this.angle) {
+                this.angle--;
+            } else if (targetAngle > this.angle) {
+                this.angle++;
+            }
 
+            // attack it
             if (this.shootTimer >= this.shootRate) {
                 this.shootTimer = 0;
                 state.projectiles.push(

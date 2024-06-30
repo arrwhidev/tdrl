@@ -5,7 +5,6 @@ import resources from '../game_resources.js'
 import { renderAndScaleTexture } from '../render.js'
 import Hud from './ui/hud.js'
 import Grid from './grid.js'
-import EditorGrid from '../editor/editor_grid.js'
 import GridCursor from '../grid_cursor.js'
 import EnemyEmitter from './objects/enemy_emitter.js'
 
