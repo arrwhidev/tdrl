@@ -2,6 +2,10 @@
 import resources from "./game_resources.js"
 
 export class TileLayer {
+    
+    spriteName: string;
+    walkable: boolean;
+
     constructor(spriteName) {
         this.setSpriteName(spriteName)
     }
@@ -22,6 +26,10 @@ export class TileLayer {
 }
 
 export class Tile {
+    
+    flatIndex: number;
+    layers: any[];
+
     constructor(flatIndex, numLayers) {
         this.flatIndex = flatIndex
         this.layers = new Array(numLayers)
@@ -37,7 +45,12 @@ export class Tile {
 }
  
 export class Map {
-    constructor(mapName, rawMapData) {
+
+    mapName: string;
+    rawMapData: any;
+    map: Tile[][];
+
+    constructor(mapName: string, rawMapData: any) {
         this.mapName = mapName;
         this.rawMapData = rawMapData;
 
@@ -50,35 +63,40 @@ export class Map {
             for (let col = 0; col < this.getNumCols(); col++) {
                 // for 1 dimensional array mapping
                 const flatIndex = row * this.getNumCols() + col;
-                this.map[row][col] = new Tile(flatIndex, this.getNumLayers())
+
+                const tile = new Tile(flatIndex, this.getNumLayers());
+                this.setTile(row, col, tile);
 
                 for (let i = 0; i < this.getNumLayers(); i++) {
                     const spriteName = this.rawMapData.map[`layer${i}`][flatIndex] || null;
-                    const tile = this.getTile(row, col);
                     tile.setLayer(i, new TileLayer(spriteName));
                 }
             }
         }
     }
 
-    getNumRows() {
+    setTile(row: number, col: number, tile: Tile) {
+        this.map[row][col] = tile;
+    }
+
+    getNumRows(): number {
         return this.rawMapData.rows;
     }
 
-    getNumCols() {
+    getNumCols(): number {
         return this.rawMapData.cols;
     }
 
-    getNumLayers() {
+    getNumLayers(): number {
         return this.rawMapData.map.layers;
     }
 
-    getTile(row, col) {
+    getTile(row: number, col: number): Tile {
         const r = this.map[row];
         return (r) ? r[col] : null;
     }
 
-    getTileLayer(row, col, layer) {
+    getTileLayer(row: number, col: number, layer: number): TileLayer {
         const tile = this.getTile(row, col);
         return (tile) ? tile.getLayer(layer) : null;
     }
@@ -89,8 +107,7 @@ export class Map {
             for (let col = 0; col < this.getNumCols(); col++) {
                 const { flatIndex, layers } = this.getTile(row, col)
                 for(let layer = 0; layer < this.getNumLayers(); layer++) {
-                    newMapData.map[`layer${layer}`][flatIndex] 
-                        = layers[layer].spriteName;
+                    newMapData.map[`layer${layer}`][flatIndex] = layers[layer].spriteName;
                 }
             }
         }

@@ -1,4 +1,4 @@
-import r from 'raylib';
+import * as r from 'raylib';
 import Enemy from './enemy.js'
 import Tower from './tower.js'
 

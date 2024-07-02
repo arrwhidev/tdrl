@@ -3,13 +3,16 @@
   "version": "0.0.1",
   "description": "Tower defence raylib",
   "scripts": {
-    "start": "node src/game/index.js",
-    "start:editor": "node src/editor/index.js"
+    "build": "tsc",
+    "start": "tsc && node dist/game/index.js",
+    "start:editor": "tsc && node dist/editor/index.js"
   },
   "author": "Arran White",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
-    "raylib": "^0.14.0"
+    "@types/node": "^20.14.9",
+    "raylib": "^0.14.0",
+    "typescript": "^5.5.3"
   }
 }

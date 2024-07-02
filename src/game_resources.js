@@ -1,6 +1,6 @@
-import r from 'raylib'
-import fs from 'fs'
-import path from 'path'
+import * as r from 'raylib'
+import * as fs from 'fs'
+import * as path from 'path'
 
 class GameResources {
 

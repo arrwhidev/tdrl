@@ -1,4 +1,4 @@
-import r from 'raylib'
+import * as r from 'raylib'
 import GameObject from './game_object.js'
 import resources from '../../game_resources.js';
 import state from '../../game_state.js';

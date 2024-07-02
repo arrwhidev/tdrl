@@ -1,4 +1,4 @@
-import r from 'raylib'
+import * as r from 'raylib'
 import resources from '../game_resources.js'
 import config from '../game_config.js'
 

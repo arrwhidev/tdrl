@@ -1,4 +1,4 @@
-import r from 'raylib'
+import * as r from 'raylib'
 import state from '../../game_state.js'
 import config from '../../game_config.js'
 import { renderSimpleText } from '../../render.js'
