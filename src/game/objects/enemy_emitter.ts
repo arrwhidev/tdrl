@@ -12,7 +12,7 @@ export default class EnemyEmitter extends GameObject {
     spawnRate: number;
     enemies: any[];
 
-    constructor(capacity = 1, maxAlive = 1) {
+    constructor(capacity = 100, maxAlive = 100) {
         super({
             position: Vec2(0,0),
             width: 0,
@@ -22,7 +22,7 @@ export default class EnemyEmitter extends GameObject {
         this.capacity = capacity; // total enemies that this emitter can emit
         this.maxAlive = maxAlive; // total enemies that are allowed to be alive
         this.spawnTimer = 0
-        this.spawnRate = 0.02
+        this.spawnRate = 0.5
         this.enemies = []
     }
 

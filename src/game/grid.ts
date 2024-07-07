@@ -159,7 +159,13 @@ export default class Grid {
         }
 
         // highlight cursor grid element
-        const sprite = resources.getSprite('cursor')
+        let sprite;
+        const { x, y } = state.gridCursor.cursor;
+        if (state.canCreateTower(y, x)) {
+            sprite = resources.getSprite('cursor')
+        } else {
+            sprite = resources.getSprite('cursor_red')
+        }
         r.DrawTexturePro(
             sprite.texture,
             sprite.rect,

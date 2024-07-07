@@ -20,6 +20,8 @@ export class TileLayer {
     canCreate(type) {
         if (type === 'tower') {
             // Towers can only be created on walls
+            // TODO: Check if there is already a tower there.
+
             return this.spriteName === 'wall'; 
         } else if (type === 'guy') {
             // Guys can only be created on floor

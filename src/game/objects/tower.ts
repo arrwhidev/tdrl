@@ -24,7 +24,7 @@ export default class Tower extends GameObject {
 
         this.angle = 0
         this.shootTimer = 0
-        this.shootRate = 1
+        this.shootRate = 0.2
         this.reach = 50
         this.target = null
     }
