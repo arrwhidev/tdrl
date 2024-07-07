@@ -3,7 +3,7 @@ import { renderSimpleText } from '../render.js'
 
 export default class Hud {
     constructor() {
-        this.camera = state.camera.hud
+        this.camera = state.getHudCamera()
         this.values = []
     }
 

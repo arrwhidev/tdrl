@@ -98,5 +98,45 @@
             "width": 32,
             "height": 32
         }
+    },
+    "dwarf_male": {
+        "name": "dwarf_male",
+        "resource": "dungeon_crawl/player/base/deep_dwarf_male.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "chest_closed": {
+        "name": "chest_closed",
+        "resource": "dungeon_crawl/dungeon/chest_2_closed.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "chest_open": {
+        "name": "chest_open",
+        "resource": "dungeon_crawl/dungeon/chest_2_open.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
+    },
+    "blue_fountain": {
+        "name": "blue_fountain",
+        "resource": "dungeon_crawl/dungeon/blue_fountain.png",
+        "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        }
     }
 }

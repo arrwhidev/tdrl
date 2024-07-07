@@ -1,5 +1,7 @@
-
 import resources from "./game_resources.js"
+
+const LAYER_MAP      = 0
+const LAYER_ELEMENTS = 1
 
 export class TileLayer {
     
@@ -19,6 +21,9 @@ export class TileLayer {
         if (type === 'tower') {
             // Towers can only be created on walls
             return this.spriteName === 'wall'; 
+        } else if (type === 'guy') {
+            // Guys can only be created on floor
+            return this.spriteName === 'floor';
         }
 
         return false;
@@ -46,29 +51,29 @@ export class Tile {
  
 export class Map {
 
-    mapName: string;
-    rawMapData: any;
-    map: Tile[][];
+    rawData: any;
+    data: Tile[][];
 
-    constructor(mapName: string, rawMapData: any) {
-        this.mapName = mapName;
-        this.rawMapData = rawMapData;
+    constructor(rawData: any) {
+        this.rawData = rawData;
 
-        this.map = new Array(this.getNumRows());
+        // Convert raw map data into an internal 2 dimensional array.
+
+        this.data = new Array(this.getNumRows());
         for (let row = 0; row < this.getNumRows(); row++) {
-            if (!this.map[row]) {
-                this.map[row] = new Array(this.getNumCols());
+            if (!this.data[row]) {
+                this.data[row] = new Array(this.getNumCols());
             }
 
             for (let col = 0; col < this.getNumCols(); col++) {
-                // for 1 dimensional array mapping
+                // For 1 dimensional array mapping
                 const flatIndex = row * this.getNumCols() + col;
 
                 const tile = new Tile(flatIndex, this.getNumLayers());
                 this.setTile(row, col, tile);
 
                 for (let i = 0; i < this.getNumLayers(); i++) {
-                    const spriteName = this.rawMapData.map[`layer${i}`][flatIndex] || null;
+                    const spriteName = this.rawData.map[`layer${i}`][flatIndex] || null;
                     tile.setLayer(i, new TileLayer(spriteName));
                 }
             }
@@ -76,23 +81,23 @@ export class Map {
     }
 
     setTile(row: number, col: number, tile: Tile) {
-        this.map[row][col] = tile;
+        this.data[row][col] = tile;
     }
 
     getNumRows(): number {
-        return this.rawMapData.rows;
+        return this.rawData.rows;
     }
 
     getNumCols(): number {
-        return this.rawMapData.cols;
+        return this.rawData.cols;
     }
 
     getNumLayers(): number {
-        return this.rawMapData.map.layers;
+        return this.rawData.map.layers;
     }
 
     getTile(row: number, col: number): Tile {
-        const r = this.map[row];
+        const r = this.data[row];
         return (r) ? r[col] : null;
     }
 
@@ -101,16 +106,17 @@ export class Map {
         return (tile) ? tile.getLayer(layer) : null;
     }
 
-    persist() {
-        const newMapData = { ...this.rawMapData }
+    persist(): void {
+        const newMapData = { ...this.rawData }
         for (let row = 0; row < this.getNumRows(); row++) {
             for (let col = 0; col < this.getNumCols(); col++) {
                 const { flatIndex, layers } = this.getTile(row, col)
                 for(let layer = 0; layer < this.getNumLayers(); layer++) {
-                    newMapData.map[`layer${layer}`][flatIndex] = layers[layer].spriteName;
+                    newMapData.map[`layer${layer}`][flatIndex]
+                        = layers[layer].spriteName;
                 }
             }
         }
-        resources.saveMap(this.mapName, newMapData)
+        resources.saveMap(this.rawData.name, newMapData)
     }
 }

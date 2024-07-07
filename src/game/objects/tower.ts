@@ -7,17 +7,26 @@ import resources from '../../game_resources.js'
 import { angleBetweenPoints } from '../../math.js'
 
 export default class Tower extends GameObject {
-    constructor(position) {
-        super(position)
-        this.width = config.TILE_SIZE
-        this.height = config.TILE_SIZE
+
+    angle: number
+    shootTimer: number
+    shootRate: number
+    reach: number
+    target: GameObject
+    
+    constructor(position: r.Vector2) {
+        super({
+            position,
+            width: config.TILE_SIZE,
+            height: config.TILE_SIZE,
+            spriteName: 'tower2',
+        })
+
         this.angle = 0
         this.shootTimer = 0
         this.shootRate = 1
         this.reach = 50
         this.target = null
-        this.scale = 1
-        this.spriteName = 'tower2'
     }
 
     update(dt) {
@@ -103,11 +112,14 @@ export default class Tower extends GameObject {
         )
         
         // tower reach
-        const center = this.getCenter()
-        r.DrawCircleLines(center.x, center.y, this.reach, {...this.color, a: 100})
 
         if(state.debug) {
             const center = this.getCenter()
+
+            // reach
+            r.DrawCircleLines(center.x, center.y, this.reach, {...this.color, a: 150})
+
+            // center dot
             r.DrawCircle(center.x, center.y, 1, r.GREEN)
 
             const rect = this.rect()

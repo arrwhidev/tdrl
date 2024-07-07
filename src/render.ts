@@ -18,6 +18,11 @@ export function renderAndScaleTexture(texture) {
 export function renderSimpleText(text, x, y) {
     r.DrawTextPro(
         resources.fonts.regular, 
-        text, { x, y }, 
-        r.Vector2(0, 0), 0, config.FONT_SIZE, 1, r.WHITE);
+        text, 
+        { x, y }, 
+        { x: 0, y: 0 },
+        0,
+        config.FONT_SIZE, 
+        1, 
+        r.WHITE);
     }

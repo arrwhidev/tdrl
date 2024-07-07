@@ -17,7 +17,7 @@ export default class EditorGrid extends Grid {
 
         // Mouse
         if (r.GetMouseWheelMove() != 0) {
-            state.camera.game.zoom += r.GetMouseWheelMove() * config.ZOOM_SPEED
+            state.getGameCamera().zoom += r.GetMouseWheelMove() * config.ZOOM_SPEED
         } else if (r.IsMouseButtonDown(r.MOUSE_BUTTON_LEFT)) {
             const row = state.gridCursor.cursor.y
             const col = state.gridCursor.cursor.x
@@ -31,17 +31,17 @@ export default class EditorGrid extends Grid {
 
         // Keyboard
         if(r.IsKeyPressed(r.KEY_EQUAL)) {
-            state.camera.game.zoom += config.ZOOM_SPEED
+            state.getGameCamera().zoom += config.ZOOM_SPEED
         } else if(r.IsKeyPressed(r.KEY_MINUS)) {
-            state.camera.game.zoom -= config.ZOOM_SPEED
+            state.getGameCamera().zoom -= config.ZOOM_SPEED
         } else if(r.IsKeyPressed(r.KEY_DOWN)) {
-            state.camera.game.offset.y -= 4
+            state.getGameCamera().offset.y -= 4
         } else if(r.IsKeyPressed(r.KEY_RIGHT)) {
-            state.camera.game.offset.x -= 4
+            state.getGameCamera().offset.x -= 4
         } else if(r.IsKeyPressed(r.KEY_UP)) {
-            state.camera.game.offset.y += 4
+            state.getGameCamera().offset.y += 4
         } else if(r.IsKeyPressed(r.KEY_LEFT)) {
-            state.camera.game.offset.x += 4
+            state.getGameCamera().offset.x += 4
         } else if(r.IsKeyPressed(r.KEY_L)) {
             this.activeLayerIndex = (this.activeLayerIndex + 1) % this.map.getNumLayers()
         } else if(r.IsKeyPressed(r.KEY_P)) {

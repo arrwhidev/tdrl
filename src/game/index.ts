@@ -1,5 +1,5 @@
 import * as r from 'raylib'
-import state, { MODE_PLAY } from '../game_state.js'
+import state from '../game_state.js'
 import config from '../game_config.js'
 import resources from '../game_resources.js'
 import { renderAndScaleTexture } from '../render.js'
@@ -7,6 +7,9 @@ import Hud from './ui/hud.js'
 import Grid from './grid.js'
 import GridCursor from '../grid_cursor.js'
 import EnemyEmitter from './objects/enemy_emitter.js'
+// import Guy from './objects/guy.js'
+import { Map } from '../map.js';
+import { Vec2 } from '../math.js'
 
 // init
 r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "tdrl")
@@ -20,25 +23,41 @@ resources.load();
 // r.PlayMusicStream(resources.music.bg)
 
 // cameras
-const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
-camera.zoom = 1
-const hudCamera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
-hudCamera.zoom = 1
-state.camera.game = camera
-state.camera.hud = hudCamera
+const gameCamera: r.Camera2D = {
+    offset: Vec2(0, 0),
+    target: Vec2(0, 0),
+    rotation: 0,
+    zoom: 1
+}
+const hudCamera: r.Camera2D = {
+    offset: Vec2(0, 0),
+    target: Vec2(0, 0),
+    rotation: 0,
+    zoom: 1
+}
+
+state.setGameCamera(gameCamera)
+state.setHudCamera(hudCamera)
+
+// map
+const rawMap = resources.getMap('dungeon')
+const map = new Map(rawMap)
 
 // game objects
-const grid = new Grid('dungeon')
+const grid = new Grid()
 const gridCursor = new GridCursor()
 const hud = new Hud()
 
+// Keep references to important stuff in global state
+state.map = map
+state.grid = grid
+state.gridCursor = gridCursor
 state.enemyEmitters.push(new EnemyEmitter())
+// state.guys.push(new Guy({ x: 22, y: 13 }, 20, 20, r.WHITE))
 
 const gameObjects = []
 gameObjects.push(grid)
-gameObjects.push(state.enemyEmitters)
-gameObjects.push(state.towers)
-gameObjects.push(state.projectiles)
+state.getGameObjects().forEach(go => gameObjects.push(go))
 gameObjects.push(gridCursor)
 gameObjects.push(hud)
 
@@ -65,7 +84,7 @@ while (!r.WindowShouldClose()) {
      */
 
     r.UpdateMusicStream(resources.music.bg);
-    if (state.mode === MODE_PLAY) {
+    if (state.isPlaying()) {
         gameObjects.forEach(o => {
             if (Array.isArray(o)) {
                 o.forEach(oo => oo.update(dt))
@@ -83,7 +102,7 @@ while (!r.WindowShouldClose()) {
     r.BeginTextureMode(tex)
     r.ClearBackground(r.BLACK)
     gameObjects.forEach(item =>  {
-        r.BeginMode2D(item.camera || state.camera.game)
+        r.BeginMode2D(item.camera || state.getGameCamera())
         if (Array.isArray(item)) {
             item.forEach(oo => oo.render())
         } else {

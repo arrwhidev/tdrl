@@ -20,8 +20,8 @@ const camera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 camera.zoom = 0.9
 const hudCamera = r.Camera2D(r.Vector2(0, 0), r.Vector2(0, 0), 0, 1)
 hudCamera.zoom = 1
-state.camera.game = camera
-state.camera.hud = hudCamera
+state.getGameCamera() = camera
+state.getHudCamera() = hudCamera
 
 // game objects
 const grid = new EditorGrid('dungeon')

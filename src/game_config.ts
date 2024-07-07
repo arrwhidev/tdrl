@@ -1,4 +1,14 @@
 class GameConfig {
+    
+    WIDTH: number
+    HEIGHT: number
+    SCALING_FACTOR: number
+    TILE_SIZE: number
+    NUM_ROWS: number
+    NUM_COLS: number
+    FONT_SIZE: number
+    ZOOM_SPEED: number
+
     constructor() {
         // dimensions
         this.WIDTH          = 640

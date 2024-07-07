@@ -3,10 +3,15 @@ import config from './game_config.js'
 import state from './game_state.js'
 
 export default class GridCursor {
+
+    camera: r.Camera2D;
+    mouse: r.Vector2;
+    cursor: r.Vector2;
+
     constructor() {
-        this.camera = state.camera.game;
-        this.mouse = r.Vector2(0, 0)
-        this.cursor = r.Vector2(0, 0)
+        this.camera = state.getGameCamera();
+        this.mouse = { x: 0, y: 0 }
+        this.cursor = { x: 0, y: 0 }
     }
 
     update(dt) {

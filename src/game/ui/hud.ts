@@ -4,8 +4,12 @@ import config from '../../game_config.js'
 import { renderSimpleText } from '../../render.js'
 
 export default class Hud {
+    
+    camera: r.Camera2D
+    values: string[]
+    
     constructor() {
-        this.camera = state.camera.hud
+        this.camera = state.getHudCamera()
         this.values = []
     }
 

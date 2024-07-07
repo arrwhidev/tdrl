@@ -3,6 +3,12 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 class GameResources {
+    
+    sprites: any[];
+    spriteDict: any;
+    fonts: { regular: r.Font, bold: r.Font };
+    music: { bg: r.Music };
+    maps: { dungeon: any; };
 
     load() {
         console.log('loading resources...')
@@ -10,19 +16,23 @@ class GameResources {
 
         this.sprites = []
         this.spriteDict = {}
-        this.spriteDict = JSON.parse(fs.readFileSync(`./resources/spritesheets/sprites.json`))
+
+        const spritesJson = fs.readFileSync(`./resources/spritesheets/sprites.json`)
+        this.spriteDict = JSON.parse(spritesJson.toString())
         for (let key in this.spriteDict) {
             const spriteConfig = this.spriteDict[key];
             this.spriteDict[key].texture = this.loadSpriteTexture(spriteConfig.resource)
             this.sprites.push(key)
         }
 
-        this.fonts = {}
-        this.fonts.regular = r.LoadFont("./resources/fonts/MinecraftRegular-Bmg3.otf")
-        this.fonts.bold = r.LoadFont("./resources/fonts/MinecraftBold-nMK1.otf")
+        this.fonts = {
+            regular: r.LoadFont("./resources/fonts/MinecraftRegular-Bmg3.otf"),
+            bold: r.LoadFont("./resources/fonts/MinecraftBold-nMK1.otf"),
+        }
 
-        this.music = {}
-        this.music.bg = this.loadMusic('bg.wav')
+        this.music = {
+            bg: this.loadMusic('bg.wav'),
+        }
 
         this.maps = {
             dungeon: this.loadMap('dungeon')
@@ -34,7 +44,7 @@ class GameResources {
 
     // sprites
 
-    loadSpriteTexture(spritePath) {
+    loadSpriteTexture(spritePath): r.Texture2D {
         return r.LoadTexture('./' + path.join('resources', 'spritesheets', spritePath))
     }
 
@@ -51,13 +61,13 @@ class GameResources {
         return this.spriteDict[name]
     }
 
-    spriteCount() {
+    spriteCount(): number {
         return this.sprites.length
     }
 
     // music
 
-    loadMusic(name) {
+    loadMusic(name): r.Music {
         const music = r.LoadMusicStream(`./resources/music/${name}`)
         while(!r.IsMusicReady(music)) {
             console.log('loading music stream...')
@@ -68,11 +78,11 @@ class GameResources {
     // maps
 
     loadMap(name) {
-        return JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`))
+        return JSON.parse(fs.readFileSync(`./resources/maps/${name}.json`).toString())
     }
 
     saveMap(name, data) {
-        fs.writeFileSync(`./resources/maps/${name}.json`, JSON.stringify(data, 2, 2))
+        fs.writeFileSync(`./resources/maps/${name}.json`, JSON.stringify(data))
     }
 
     getMap(name) {
