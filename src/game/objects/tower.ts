@@ -5,6 +5,7 @@ import state from '../../game_state.js'
 import config from '../../game_config.js'
 import resources from '../../game_resources.js'
 import { angleBetweenPoints } from '../../math.js'
+import Enemy from './enemy.js'
 
 export default class Tower extends GameObject {
 
@@ -12,7 +13,7 @@ export default class Tower extends GameObject {
     shootTimer: number
     shootRate: number
     reach: number
-    target: GameObject
+    target: Enemy
     
     constructor(position: r.Vector2) {
         super({
@@ -24,7 +25,7 @@ export default class Tower extends GameObject {
 
         this.angle = 0
         this.shootTimer = 0
-        this.shootRate = 0.2
+        this.shootRate = 1
         this.reach = 50
         this.target = null
     }
@@ -32,6 +33,16 @@ export default class Tower extends GameObject {
     update(dt) {
         this.shootTimer += dt;
         this.color = r.WHITE;
+
+        // Make sure target is still alive
+        if (this.target && !this.target.isAlive()) {
+            this.target = null;
+        }
+
+        // Check if enemy is still in reach
+        if (this.target && !r.CheckCollisionCircleRec(this.position, this.reach, this.target.rect())) {
+            this.target = null;
+        }
 
         // Try to find a target if there isn't one
         if (!this.target) {
@@ -50,16 +61,9 @@ export default class Tower extends GameObject {
         }
 
         if (this.target) {
-            // check if enemy is still in reach
-            if (!r.CheckCollisionCircleRec(this.position, this.reach, this.target.rect())) {
-                this.target = null;
-                return;
-            }
             this.color = r.GREEN;
-
-            // enemy is within reach!
             
-            // rotate towards it
+            // Rotate towards it
             const targetAngle = angleBetweenPoints(this.target.position, this.position)
             if (targetAngle < this.angle) {
                 this.angle--;
@@ -67,7 +71,7 @@ export default class Tower extends GameObject {
                 this.angle++;
             }
 
-            // attack it
+            // fire projectile
             if (this.shootTimer >= this.shootRate) {
                 this.shootTimer = 0;
                 const turretPosition = this.getTurretPosition()
@@ -111,8 +115,6 @@ export default class Tower extends GameObject {
             r.BROWN
         )
         
-        // tower reach
-
         if(state.debug) {
             const center = this.getCenter()
 

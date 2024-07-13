@@ -12,9 +12,9 @@ export default class EnemyEmitter extends GameObject {
     spawnRate: number;
     enemies: any[];
 
-    constructor(capacity = 100, maxAlive = 100) {
+    constructor(position = Vec2(0, 0), capacity = 1, maxAlive = 1) {
         super({
-            position: Vec2(0,0),
+            position,
             width: 0,
             height: 0,
         })
@@ -43,12 +43,7 @@ export default class EnemyEmitter extends GameObject {
 
         this.enemies.forEach(enemy => {
             enemy.update(dt);
-            if (enemy.health <= 0) {
-                state.addCoins(1)
-            }
         });
-
-        this.enemies = this.enemies.filter(enemy => enemy.health > 0);
     }
 
     render() {
@@ -80,7 +75,7 @@ export default class EnemyEmitter extends GameObject {
         //     x = maxX + buffer
         //     y = r.GetRandomValue(0, maxY)
         // }
-        console.log('create enemy at row', y, 'col', x)
+        // console.log('create enemy at row', y, 'col', x)
         return Enemy.createAtGridPosition(y, x)
     }
 }

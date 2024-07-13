@@ -4,10 +4,10 @@ import config from '../../game_config.js'
 import { Vec2 } from '../../math.js';
 
 export interface GameObjectConfig {
-    position: r.Vector2;
+    position?: r.Vector2;
     velocity?: r.Vector2;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     scale?: number;
     speed?: number;
     color?: r.Color;
@@ -24,6 +24,7 @@ export default abstract class GameObject {
     speed: number;
     color: r.Color;
     spriteName: string;
+    camera: r.Camera2D;
 
     constructor(config: GameObjectConfig) {
         this.position = config.position || Vec2(0, 0);
@@ -39,7 +40,7 @@ export default abstract class GameObject {
     abstract update(dt);
     abstract render();
 
-    rect() {
+    rect(): r.Rectangle {
         return {
             x: this.position.x,
             y: this.position.y,

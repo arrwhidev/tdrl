@@ -1,6 +1,8 @@
 import * as r from 'raylib'
 import config from './game_config.js'
 import resources from './game_resources.js'
+import state from './game_state.js';
+import GameObject from './game/objects/game_object.js';
 
 export function renderAndScaleTexture(texture) {
     r.BeginDrawing()
@@ -26,3 +28,9 @@ export function renderSimpleText(text, x, y) {
         1, 
         r.WHITE);
     }
+
+export function renderGameObject(go: GameObject) {
+    r.BeginMode2D(go.camera || state.getGameCamera())
+    go.render()
+    r.EndMode2D()
+}

@@ -2,6 +2,7 @@ import * as r from 'raylib'
 import resources from '../game_resources.js'
 import config from '../game_config.js'
 import state from '../game_state.js'
+import GameObject from './objects/game_object.js'
 
 // /**
 //  * Returns grid position { row, col }
@@ -23,13 +24,13 @@ import state from '../game_state.js'
 //     }
 // }
 
-export default class Grid {
+export default class Grid extends GameObject {
 
     renderGridLines: boolean
     renderLayers: boolean[]
-    camera: r.Camera2D
     
     constructor() {
+        super({})
         this.renderGridLines = false
         this.renderLayers = [true, true]
         this.camera = state.getGameCamera()

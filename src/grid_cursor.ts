@@ -1,14 +1,15 @@
 import * as r from 'raylib'
 import config from './game_config.js'
 import state from './game_state.js'
+import GameObject from './game/objects/game_object.js';
 
-export default class GridCursor {
+export default class GridCursor extends GameObject {
 
-    camera: r.Camera2D;
     mouse: r.Vector2;
     cursor: r.Vector2;
 
     constructor() {
+        super({})
         this.camera = state.getGameCamera();
         this.mouse = { x: 0, y: 0 }
         this.cursor = { x: 0, y: 0 }
@@ -23,6 +24,8 @@ export default class GridCursor {
         this.cursor.y = Math.floor(this.mouse.y / config.TILE_SIZE);
     }
 
+    render() {}
+
     getCursorNormalizedX() {
         return this.cursor.x * config.TILE_SIZE
     }
@@ -30,6 +33,4 @@ export default class GridCursor {
     getCursorNormalizedY() {
         return this.cursor.y * config.TILE_SIZE
     }
-
-    render() {}
 }

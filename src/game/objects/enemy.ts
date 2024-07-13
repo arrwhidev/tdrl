@@ -7,15 +7,17 @@ import { astar } from '../pathfinding.js';
 import { Vec2 } from '../../math.js';
 
 export default class Enemy extends GameObject {
-    
-    gridPosition: r.Vector2;
+
     health: number;
+    maxHealth: number;
+    gridPosition: r.Vector2;
     target: r.Vector2;
     path: r.Vector2[];
     
     constructor(config: GameObjectConfig, health: number, target: r.Vector2) {
         super(config)
         this.health = health
+        this.maxHealth = health
 
         this.target = target
         this.path = []
@@ -75,7 +77,7 @@ export default class Enemy extends GameObject {
                     y: nextTileY - this.position.y,
                 }
         
-                const normalized = Vec2(0,0)
+                const normalized = Vec2(0, 0)
                 const length = Math.sqrt(Math.pow(diffVector.x, 2) + Math.pow(diffVector.y, 2))
                 if (length != 0) {
                     normalized.x = diffVector.x / length
@@ -91,10 +93,6 @@ export default class Enemy extends GameObject {
                 this.calculatePath(this.target)
             }
         }
-    }
-
-    calculatePath(target) {
-        this.path = astar(state.map, this.gridPosition, target)
     }
 
     render() {
@@ -132,5 +130,17 @@ export default class Enemy extends GameObject {
             const center = this.getCenter()
             r.DrawCircle(center.x, center.y, 1, r.GREEN)
         }
+    }
+
+    calculatePath(target) {
+        this.path = astar(state.map, this.gridPosition, target)
+    }
+
+    takeDamage(damage: number) {
+        this.health -= damage;
+    }
+
+    isAlive(): boolean { 
+        return this.health > 0
     }
 }

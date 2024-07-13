@@ -2,29 +2,31 @@ import * as r from 'raylib'
 import Tower from './game/objects/tower.js'
 import { Map } from './map.js';
 import Grid from './game/grid.js';
+import EnemyEmitter from './game/objects/enemy_emitter.js';
+import Projectile from './game/objects/projectile.js';
+import GameObject from './game/objects/game_object.js';
+import Hud from './game/ui/hud.js';
+import GridCursor from './grid_cursor.js';
 
 const MODE_PLAY  = 0;
 const MODE_PAUSE = 1;
 
 class GameState {
-    addCoins(arg0: number) {
-        throw new Error('Method not implemented.');
-    }
-    
+
     mode: number;
     debug: boolean;
     map: Map;
     grid: Grid;
 
-    hud: any;
+    hud: Hud;
     camera: any;
     
-    gridCursor: any;
+    gridCursor: GridCursor;
     
-    towers: any[];
-    projectiles: any[];
-    enemyEmitters: any[];
-    guys: any[];
+    towers: Tower[];
+    projectiles: Projectile[];
+    enemyEmitters: EnemyEmitter[];
+    // guys: Guy[];
     
     constructor() {
         this.mode = MODE_PLAY
@@ -34,19 +36,23 @@ class GameState {
         this.towers = []
         this.projectiles = []
         this.enemyEmitters = []
-        this.guys = []
+        // this.guys = []
     }
 
     // Game Objects
 
-    getGameObjects() {
-        // Order matters
-        return [
-            this.enemyEmitters,
-            this.guys,
-            this.towers,
-            this.projectiles
-        ]
+    getGameObjects(): GameObject[] {
+        let arr = []
+        for (let i = 0; i < this.enemyEmitters.length; i++) {
+            arr.push(this.enemyEmitters[i]);
+        }
+        for (let i = 0; i < this.towers.length; i++) {
+            arr.push(this.towers[i]);
+        }
+        for (let i = 0; i < this.projectiles.length; i++) {
+            arr.push(this.projectiles[i]);
+        }
+        return arr
     }
 
     // Cameras
@@ -123,17 +129,17 @@ class GameState {
 
     isWalkable(row, col) {
         const tileLayer = this.map.getTileLayer(row, col, 0);
-        return tileLayer.walkable;
+        return tileLayer?.walkable;
     }
 
     canCreateTower(row, col) {
         const tileLayer = this.map.getTileLayer(row, col, 0);
-        return tileLayer.canCreate('tower');
+        return tileLayer?.canCreate('tower');
     }
 
     canCreateGuy(row, col) {
         const tileLayer = this.map.getTileLayer(row, col, 0);
-        return tileLayer.canCreate('guy');
+        return tileLayer?.canCreate('guy');
     }
 }
 

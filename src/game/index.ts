@@ -2,7 +2,8 @@ import * as r from 'raylib'
 import state from '../game_state.js'
 import config from '../game_config.js'
 import resources from '../game_resources.js'
-import { renderAndScaleTexture } from '../render.js'
+import { checkCollisions } from './collision.js'
+import { renderAndScaleTexture, renderGameObject } from '../render.js'
 import Hud from './ui/hud.js'
 import Grid from './grid.js'
 import GridCursor from '../grid_cursor.js'
@@ -10,6 +11,9 @@ import EnemyEmitter from './objects/enemy_emitter.js'
 // import Guy from './objects/guy.js'
 import { Map } from '../map.js';
 import { Vec2 } from '../math.js'
+import { cleanGameObjects } from './clean.js'
+import Projectile from './objects/projectile.js'
+import GameObject from './objects/game_object.js'
 
 // init
 r.InitWindow(config.WIDTH * config.SCALING_FACTOR, config.HEIGHT * config.SCALING_FACTOR, "tdrl")
@@ -48,22 +52,12 @@ const grid = new Grid()
 const gridCursor = new GridCursor()
 const hud = new Hud()
 
-// Keep references to important stuff in global state
 state.map = map
 state.grid = grid
 state.gridCursor = gridCursor
+state.hud = hud;
 state.enemyEmitters.push(new EnemyEmitter())
 // state.guys.push(new Guy({ x: 22, y: 13 }, 20, 20, r.WHITE))
-
-const gameObjects = []
-gameObjects.push(grid)
-state.getGameObjects().forEach(go => gameObjects.push(go))
-gameObjects.push(gridCursor)
-gameObjects.push(hud)
-
-// Keep references to important stuff in global state
-state.grid = grid
-state.gridCursor = gridCursor
 
 const tex = r.LoadRenderTexture(config.WIDTH, config.HEIGHT)
 while (!r.WindowShouldClose()) {
@@ -79,19 +73,23 @@ while (!r.WindowShouldClose()) {
         state.toggleDebug()
     }
 
+    const gameObjects = state.getGameObjects();
+
     /**
      * Update
      */
 
     r.UpdateMusicStream(resources.music.bg);
     if (state.isPlaying()) {
-        gameObjects.forEach(o => {
-            if (Array.isArray(o)) {
-                o.forEach(oo => oo.update(dt))
-            } else {
-                o.update(dt)
-            }
+        state.grid.update(dt);
+        gameObjects.forEach((go: GameObject) => {
+            go.update(dt)            
         })
+        state.gridCursor.update(dt)
+        state.hud.update(dt)
+
+        checkCollisions();
+        cleanGameObjects();
     }
 
     /**
@@ -101,15 +99,14 @@ while (!r.WindowShouldClose()) {
     // Render game objects to texture at internal resolution
     r.BeginTextureMode(tex)
     r.ClearBackground(r.BLACK)
-    gameObjects.forEach(item =>  {
-        r.BeginMode2D(item.camera || state.getGameCamera())
-        if (Array.isArray(item)) {
-            item.forEach(oo => oo.render())
-        } else {
-            item.render()
-        }
-        r.EndMode2D()
+
+    renderGameObject(state.grid)
+    gameObjects.forEach((go: GameObject) => {
+        renderGameObject(go);
     })
+    renderGameObject(state.gridCursor)
+    renderGameObject(state.hud)
+
     r.EndTextureMode()
 
     // Scale to full resolution
