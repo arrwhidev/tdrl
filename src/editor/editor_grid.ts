@@ -5,8 +5,12 @@ import state from '../game_state.js'
 import Grid from '../game/grid.js'
 
 export default class EditorGrid extends Grid {
-    constructor(mapName) {
-        super(mapName)
+
+    activeLayerIndex: number
+    activeSpriteIndex: number
+    
+    constructor() {
+        super();
         this.renderGridLines = false
         this.activeSpriteIndex = 0
         this.activeLayerIndex = 0
@@ -23,7 +27,7 @@ export default class EditorGrid extends Grid {
             const col = state.gridCursor.cursor.x
             const layer = this.activeLayerIndex
             const spriteName = resources.getSpriteNameAtIndex(this.activeSpriteIndex)
-            const tileLayer = this.map.getTileLayer(row, col, layer);
+            const tileLayer = state.map.getTileLayer(row, col, layer);
             if (tileLayer) {
                 tileLayer.setSpriteName(spriteName)
             }
@@ -43,7 +47,7 @@ export default class EditorGrid extends Grid {
         } else if(r.IsKeyPressed(r.KEY_LEFT)) {
             state.getGameCamera().offset.x += 4
         } else if(r.IsKeyPressed(r.KEY_L)) {
-            this.activeLayerIndex = (this.activeLayerIndex + 1) % this.map.getNumLayers()
+            this.activeLayerIndex = (this.activeLayerIndex + 1) % state.map.getNumLayers()
         } else if(r.IsKeyPressed(r.KEY_P)) {
             this.activeSpriteIndex = (this.activeSpriteIndex + 1) % resources.spriteCount()
         } else if (r.IsKeyPressed(r.KEY_O)) {
@@ -52,9 +56,9 @@ export default class EditorGrid extends Grid {
             const row = state.gridCursor.cursor.y
             const col = state.gridCursor.cursor.x
             const layer = this.activeLayerIndex
-            this.map.getTileLayer(row, col, layer).spriteName = null
+            state.map.getTileLayer(row, col, layer).spriteName = null
         } else if (r.IsKeyPressed(r.KEY_ENTER)) {
-            this.map.persist();
+            state.map.persist();
         } else if (r.IsKeyPressed(r.KEY_V)) {
             this.renderLayers[this.activeLayerIndex] = !this.renderLayers[this.activeLayerIndex];
         } else if (r.IsKeyPressed(r.KEY_G)) {
